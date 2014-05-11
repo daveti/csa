@@ -1,2 +1,0 @@
-Premain-Class: org.davejingtian.certshim.agent.Agent
-Boot-Class-Path: ../lib/javassist.jar
