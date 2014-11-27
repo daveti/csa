@@ -1,0 +1,2358 @@
+1. Download the OpenJDK source (OpenJDK6)
+https://java.net/projects/openjdk6/downloads/
+1.1 OpenJDK7
+http://openjdk.java.net/projects/jdk7u/
+hg clone http://hg.openjdk.java.net/jdk7u/jdk7u60/
+cd jdk7u60
+chmod +x ./get_source.sh
+./get_source.sh
+
+2. Hack (Sun SSL Implementation)
+jdk/src/share/classes/sun/security/ssl/X509TrustManagerImpl.java
+
+3. Build (Ubuntu 14.04 LTS x86_64)
+sudo aptitude build-dep openjdk-6
+sudo aptitude install openjdk-6-jdk gcc-4.8 g++-4.8
+sudo aptitude install libmotif-dev
+export LANG=C ALT_BOOTDIR=/usr/lib/jvm/java-6-openjdk-amd64
+make all CC=gcc-4.8 CPP=g++-4.8
+
+4. Install
+The whole SDK suite could be found at
+build/linux-amd64/j2sdk-image
+The whole JRE suite could found at
+build/linux-amd64/j2re-image
+
+5. Test
+build/linux-amd64/j2sdk-image/bin/java -version
+build/linux-amd64/j2sdk-image/bin/javac Hello.java
+build/linux-amd64/j2sdk-image/bin/java Hello
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java -version
+openjdk version "1.6.0-internal"
+OpenJDK Runtime Environment (build 1.6.0-internal-root_07_may_2014_21_37-b00)
+OpenJDK 64-Bit Server VM (build 23.25-b01, mixed mode)
+
+6. SSL Test
+Update CA certs to avoid - Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+Under build/linux-amd64/j2sdk-image/jre/lib/security/
+mv cacerts cacerts.orig
+ln -s /etc/ssl/certs/java/cacerts cacerts
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java SSLSocketClient
+getCipherSuites(): [Ljava.lang.String;@eee2024
+getNeedClientAuth(): false
+getProtocols(): [Ljava.lang.String;@33802324
+getWantClientAuth(): false
+
+daveti: algorithm = null
+HTTP/1.1 200 OK
+cache-control: no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+content-length: 45584
+content-type: text/html;charset=utf-8
+date: Thu, 08 May 2014 06:09:16 GMT
+expires: Tue, 31 Mar 1981 05:00:00 GMT
+last-modified: Thu, 08 May 2014 06:09:16 GMT
+ms: S
+pragma: no-cache
+server: tfe
+set-cookie: _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCOg6c9pFAToMY3NyZl9p%250AZCIlOWRmMjU3OGQ4ODM3ZWFlYjEyZjc1NmU2MTRkMmFiMWI6B2lkIiViMmEx%250ANjMwOGM2MjQ2MTE1YjllODNkZmFkMGU4YzlmOQ%253D%253D--e356d841f9720feddf1322328bff5950bd51ceb6; Path=/; Domain=.twitter.com; Secure; HTTPOnly
+set-cookie: guest_id=v1%3A139952935600617749; Domain=.twitter.com; Path=/; Expires=Sat, 07-May-2016 06:09:16 UTC
+status: 200 OK
+strict-transport-security: max-age=631138519
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-transaction: a8f80c2d61b5c31e
+x-ua-compatible: IE=edge,chrome=1
+x-xss-protection: 1; mode=block
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="lt-ie10 ie8" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if IE 9]><html class="lt-ie10 ie9" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en" data-scribe-reduced-action-queue="true"><!--<![endif]-->
+  <head>
+
+
+7. Java Agent (Needs Javassit)
+git clone https://github.com/jboss-javassist/javassist
+cp javassist/javassist.jar build/linux-amd64/j2sdk-image/jre/lib/ext
+
+root@daveti-virtual-machine:~/java/org/davejingtian/certshim/agent# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/javac -cp ../lib/javassist.jar Agent.java
+warning: ../lib/javassist.jar(javassist/CannotCompileException.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/ClassPool.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/CtClass.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/CtMethod.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/LoaderClassPath.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/NotFoundException.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/ClassPath.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/CtBehavior.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+warning: ../lib/javassist.jar(javassist/CtMember.class): major version 51 is newer than 50, the highest major version supported by this compiler.
+It is recommended that the compiler be upgraded.
+9 warnings
+
+ROOT CAUSE: javassist lib is compiled using JDK 7, which has major version 51. We are using JDK 6 for the compiling which has major version 50.
+FIX: Build javassist lib using JDK 6 again.
+THEN: cp the new javassist.jar into j2sdk/jre/lib/ext
+
+root@daveti-virtual-machine:~/git/javassist# echo $JAVA_HOME
+
+root@daveti-virtual-machine:~/git/javassist# export JAVA_HOME=/root/openjdk6_hack/build/linux-amd64/j2sdk-image
+root@daveti-virtual-machine:~/git/javassist# echo $JAVA_HOME
+/root/openjdk6_hack/build/linux-amd64/j2sdk-image
+root@daveti-virtual-machine:~/git/javassist# ll
+total 808
+drwxr-xr-x 8 root root   4096 May  8 13:15 ./
+drwxr-xr-x 3 root root   4096 May  7 23:38 ../
+-rw-r--r-- 1 root root  10677 May  8 13:15 build.xml
+drwxr-xr-x 8 root root   4096 May  7 23:39 .git/
+-rw-r--r-- 1 root root    103 May  7 23:39 .gitignore
+-rw-r--r-- 1 root root 707490 May  7 23:39 javassist.jar.orig
+-rw-r--r-- 1 root root  25890 May  7 23:39 License.html
+-rw-r--r-- 1 root root   9526 May  7 23:39 pom.xml
+-rw-r--r-- 1 root root  26631 May  7 23:39 Readme.html
+drwxr-xr-x 2 root root   4096 May  8 13:12 runtest/
+drwxr-xr-x 9 root root   4096 May  7 23:39 sample/
+drwxr-xr-x 4 root root   4096 May  7 23:39 src/
+drwxr-xr-x 5 root root   4096 May  8 13:12 target/
+drwxr-xr-x 2 root root   4096 May  7 23:39 tutorial/
+root@daveti-virtual-machine:~/git/javassist# ant
+Buildfile: /root/git/javassist/build.xml
+
+prepare:
+
+compile14:
+    [javac] /root/git/javassist/build.xml:80: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 212 source files to /root/git/javassist/target/classes
+
+jar:
+      [jar] Building jar: /root/git/javassist/javassist.jar
+      [jar] Building jar: /root/git/javassist/javassist-src.jar
+
+BUILD SUCCESSFUL
+Total time: 4 seconds
+root@daveti-virtual-machine:~/git/javassist# ll
+total 1976
+drwxr-xr-x 8 root root   4096 May  8 13:16 ./
+drwxr-xr-x 3 root root   4096 May  7 23:38 ../
+-rw-r--r-- 1 root root  10677 May  8 13:15 build.xml
+drwxr-xr-x 8 root root   4096 May  7 23:39 .git/
+-rw-r--r-- 1 root root    103 May  7 23:39 .gitignore
+-rw-r--r-- 1 root root 677599 May  8 13:16 javassist.jar
+-rw-r--r-- 1 root root 707490 May  7 23:39 javassist.jar.orig
+-rw-r--r-- 1 root root 513625 May  8 13:16 javassist-src.jar
+-rw-r--r-- 1 root root  25890 May  7 23:39 License.html
+-rw-r--r-- 1 root root   9526 May  7 23:39 pom.xml
+-rw-r--r-- 1 root root  26631 May  7 23:39 Readme.html
+drwxr-xr-x 2 root root   4096 May  8 13:12 runtest/
+drwxr-xr-x 9 root root   4096 May  7 23:39 sample/
+drwxr-xr-x 4 root root   4096 May  7 23:39 src/
+drwxr-xr-x 5 root root   4096 May  8 13:12 target/
+drwxr-xr-x 2 root root   4096 May  7 23:39 tutorial/
+root@daveti-virtual-machine:~/git/javassist# cp ./javassist.jar /root/openjdk6_hack/build/linux-amd64/j2sdk-image/jre/lib/ext
+root@daveti-virtual-machine:~/git/javassist# cp ./javassist.jar /root/java/org/davejingtian/certshim/lib
+root@daveti-virtual-machine:~/git/javassist# 
+
+root@daveti-virtual-machine:~/java/org/davejingtian/certshim/agent# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/javac Agent.java
+
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/jar cmf ./manifest.txt certShimAgent.jar ./org/*
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java -javaagent:certShimAgent.jar SSLSocketClient
+daveti: Agent starts!
+Exception in thread "main" java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:622)
+	at sun.instrument.InstrumentationImpl.loadClassAndStartAgent(InstrumentationImpl.java:343)
+	at sun.instrument.InstrumentationImpl.loadClassAndCallPremain(InstrumentationImpl.java:358)
+Caused by: java.lang.NoClassDefFoundError: javassist/CannotCompileException
+	at org.davejingtian.certshim.agent.Agent.premain(Agent.java:33)
+	... 6 more
+Caused by: java.lang.ClassNotFoundException: javassist.CannotCompileException
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:217)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:205)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:323)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:294)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:268)
+	... 7 more
+FATAL ERROR in native method: processing of -javaagent failed
+Aborted (core dumped)
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java -cp ./javassist.jar -javaagent:certShimAgent.jar SSLSocketClient
+daveti: Agent starts!
+Exception in thread "main" java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:622)
+	at sun.instrument.InstrumentationImpl.loadClassAndStartAgent(InstrumentationImpl.java:343)
+	at sun.instrument.InstrumentationImpl.loadClassAndCallPremain(InstrumentationImpl.java:358)
+Caused by: java.lang.UnsupportedClassVersionError: javassist/CannotCompileException : Unsupported major.minor version 51.0
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:643)
+	at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	at java.net.URLClassLoader.defineClass(URLClassLoader.java:277)
+	at java.net.URLClassLoader.access$000(URLClassLoader.java:73)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:212)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:205)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:323)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:294)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:268)
+	at org.davejingtian.certshim.agent.Agent.premain(Agent.java:33)
+	... 6 more
+FATAL ERROR in native method: processing of -javaagent failed
+Aborted (core dumped)
+
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java -javaagent:certShimAgent.jar SSLSocketClient
+daveti: Agent starts!
+Before loading class SSLSocketClient
+Before loading class com/sun/net/ssl/internal/ssl/Provider
+Before loading class sun/security/ssl/SunJSSE
+Before loading class sun/net/www/protocol/http/Handler
+Before loading class sun/security/ssl/SunJSSE$1
+Before loading class sun/security/jca/ProviderConfig$1
+Before loading class sun/security/jca/ProviderConfig$3
+Before loading class sun/security/rsa/SunRsaSign
+Before loading class sun/security/rsa/SunRsaSignEntries
+Before loading class com/sun/crypto/provider/SunJCE
+Before loading class java/lang/SecurityException
+Before loading class java/security/SecureRandom
+Before loading class java/util/Random
+Before loading class java/util/concurrent/atomic/AtomicLong
+Before loading class java/util/AbstractList$Itr
+Before loading class java/util/LinkedHashMap$EntryIterator
+Before loading class java/util/LinkedHashMap$LinkedHashIterator
+Before loading class java/security/Provider$Service
+Before loading class java/security/Provider$UString
+Before loading class java/util/LinkedHashSet
+Before loading class java/util/HashMap$Values
+Before loading class java/util/LinkedHashMap$ValueIterator
+Before loading class java/util/Collections$UnmodifiableSet
+Before loading class java/util/Collections$UnmodifiableCollection
+Before loading class java/util/Collections$UnmodifiableCollection$1
+Before loading class java/util/HashMap$KeySet
+Before loading class java/util/LinkedHashMap$KeyIterator
+Before loading class sun/security/jca/GetInstance
+Before loading class sun/security/jca/GetInstance$Instance
+Before loading class com/sun/crypto/provider/SunJCE$1
+Before loading class sun/security/jgss/SunProvider
+Before loading class sun/security/jgss/SunProvider$1
+Before loading class com/sun/security/sasl/Provider
+Before loading class com/sun/security/sasl/Provider$1
+Before loading class org/jcp/xml/dsig/internal/dom/XMLDSigRI
+Before loading class org/jcp/xml/dsig/internal/dom/XMLDSigRI$1
+Before loading class sun/security/smartcardio/SunPCSC
+Before loading class sun/security/smartcardio/SunPCSC$1
+Before loading class javax/net/ssl/SSLSocketFactory
+Before loading class javax/net/SocketFactory
+Before loading class javax/net/ssl/SSLSocketFactory$1
+Before loading class javax/net/ssl/SSLContext
+Before loading class javax/net/ssl/SSLContextSpi
+Before loading class sun/security/ssl/DefaultSSLContextImpl
+Before loading class sun/security/ssl/SSLContextImpl
+Before loading class sun/security/ssl/Debug
+Before loading class sun/security/ssl/EphemeralKeyManager
+Before loading class sun/security/ssl/EphemeralKeyManager$EphemeralKeyPair
+Before loading class sun/security/ssl/SSLSessionContextImpl
+Before loading class javax/net/ssl/SSLSessionContext
+Before loading class sun/misc/Cache
+Before loading class sun/misc/CacheEntry
+Before loading class sun/misc/Ref
+Before loading class sun/security/ssl/SSLSessionContextImpl$1
+Before loading class sun/security/ssl/DefaultSSLContextImpl$1
+Before loading class java/security/KeyStore
+Before loading class java/security/KeyStore$1
+Before loading class java/security/KeyStoreSpi
+Before loading class sun/security/provider/JavaKeyStore$JKS
+Before loading class sun/security/provider/JavaKeyStore
+Before loading class javax/net/ssl/KeyManagerFactory
+Before loading class javax/net/ssl/KeyManagerFactory$1
+Before loading class javax/net/ssl/KeyManagerFactorySpi
+Before loading class sun/security/ssl/KeyManagerFactoryImpl$SunX509
+Before loading class sun/security/ssl/KeyManagerFactoryImpl
+Before loading class sun/security/ssl/SunX509KeyManagerImpl
+Before loading class javax/net/ssl/X509ExtendedKeyManager
+Before loading class javax/net/ssl/X509KeyManager
+Before loading class javax/net/ssl/KeyManager
+Before loading class java/util/Collections$EmptyEnumeration
+Before loading class sun/security/ssl/TrustManagerFactoryImpl
+Before loading class javax/net/ssl/TrustManagerFactorySpi
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$2
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$1
+Before loading class java/io/DataInputStream
+Before loading class java/io/DataInput
+Before loading class sun/security/provider/JavaKeyStore$TrustedCertEntry
+Before loading class java/util/Date
+Before loading class sun/util/calendar/CalendarSystem
+Before loading class sun/util/calendar/Gregorian
+Before loading class sun/util/calendar/BaseCalendar
+Before loading class sun/util/calendar/AbstractCalendar
+Before loading class java/security/cert/CertificateFactory
+Before loading class java/security/cert/CertificateFactorySpi
+Before loading class sun/security/provider/X509Factory
+Before loading class sun/security/util/Cache
+Before loading class sun/security/util/MemoryCache
+Before loading class sun/security/util/Cache$EqualByteArray
+Before loading class sun/security/x509/X509CertImpl
+Before loading class sun/security/util/DerEncoder
+Before loading class sun/security/util/DerValue
+Before loading class sun/security/util/DerInputStream
+Before loading class sun/security/util/DerInputBuffer
+Before loading class sun/security/util/DerOutputStream
+Before loading class sun/security/util/ByteArrayLexOrder
+Before loading class sun/security/util/ByteArrayTagOrder
+Before loading class sun/security/x509/AlgorithmId
+Before loading class sun/security/util/ObjectIdentifier
+Before loading class sun/security/x509/X509CertInfo
+Before loading class sun/security/x509/CertAttrSet
+Before loading class java/lang/Integer$IntegerCache
+Before loading class sun/security/x509/CertificateVersion
+Before loading class java/math/BigInteger
+Before loading class sun/security/x509/CertificateSerialNumber
+Before loading class sun/security/x509/SerialNumber
+Before loading class sun/security/x509/CertificateAlgorithmId
+Before loading class sun/security/x509/CertificateIssuerName
+Before loading class sun/security/x509/X500Name
+Before loading class sun/security/x509/GeneralNameInterface
+Before loading class sun/security/x509/X500Name$1
+Before loading class javax/security/auth/x500/X500Principal
+Before loading class sun/security/x509/RDN
+Before loading class sun/security/util/DerIndefLenConverter
+Before loading class sun/security/x509/AVA
+Before loading class sun/security/action/GetBooleanAction
+Before loading class sun/security/x509/CertificateValidity
+Before loading class sun/util/calendar/Gregorian$Date
+Before loading class sun/util/calendar/BaseCalendar$Date
+Before loading class sun/util/calendar/CalendarDate
+Before loading class sun/util/calendar/CalendarUtils
+Before loading class sun/security/x509/CertificateSubjectName
+Before loading class sun/security/x509/CertificateX509Key
+Before loading class sun/security/x509/X509Key
+Before loading class java/security/PublicKey
+Before loading class java/security/Key
+Before loading class sun/security/util/BitArray
+Before loading class java/security/spec/X509EncodedKeySpec
+Before loading class java/security/spec/EncodedKeySpec
+Before loading class java/security/spec/KeySpec
+Before loading class java/security/KeyFactory
+Before loading class sun/security/jca/ProviderList$ServiceList
+Before loading class sun/security/jca/ProviderList$ServiceList$1
+Before loading class sun/security/rsa/RSAKeyFactory
+Before loading class java/security/KeyFactorySpi
+Before loading class java/security/spec/RSAPublicKeySpec
+Before loading class java/security/spec/RSAPrivateKeySpec
+Before loading class java/security/spec/RSAPrivateCrtKeySpec
+Before loading class java/security/spec/PKCS8EncodedKeySpec
+Before loading class sun/security/rsa/RSAPublicKeyImpl
+Before loading class java/security/interfaces/RSAPublicKey
+Before loading class java/security/interfaces/RSAKey
+Before loading class sun/security/rsa/RSAPrivateCrtKeyImpl
+Before loading class java/security/interfaces/RSAPrivateCrtKey
+Before loading class java/security/interfaces/RSAPrivateKey
+Before loading class java/security/PrivateKey
+Before loading class sun/security/pkcs/PKCS8Key
+Before loading class sun/security/x509/CertificateExtensions
+Before loading class java/util/TreeMap
+Before loading class java/util/NavigableMap
+Before loading class java/util/SortedMap
+Before loading class sun/security/x509/Extension
+Before loading class sun/security/x509/OIDMap
+Before loading class sun/security/x509/PKIXExtensions
+Before loading class sun/security/x509/OIDMap$OIDInfo
+Before loading class sun/security/x509/BasicConstraintsExtension
+Before loading class java/util/TreeMap$Entry
+Before loading class sun/security/x509/IssuerAlternativeNameExtension
+Before loading class sun/security/x509/GeneralNames
+Before loading class sun/security/x509/GeneralName
+Before loading class sun/security/x509/DNSName
+Before loading class sun/nio/cs/US_ASCII
+Before loading class sun/nio/cs/US_ASCII$Decoder
+Before loading class sun/security/x509/OtherName
+Before loading class sun/security/x509/SubjectKeyIdentifierExtension
+Before loading class sun/security/x509/KeyIdentifier
+Before loading class sun/security/x509/AuthorityKeyIdentifierExtension
+Before loading class sun/security/x509/KeyUsageExtension
+Before loading class sun/security/x509/SubjectAlternativeNameExtension
+Before loading class sun/security/x509/CRLDistributionPointsExtension
+Before loading class sun/security/x509/DistributionPoint
+Before loading class sun/security/x509/URIName
+Before loading class java/net/URI
+Before loading class java/net/URI$Parser
+Before loading class sun/security/x509/AuthorityInfoAccessExtension
+Before loading class sun/security/x509/AccessDescription
+Before loading class sun/security/x509/CertificatePoliciesExtension
+Before loading class sun/security/x509/PolicyInformation
+Before loading class sun/security/x509/CertificatePolicyId
+Before loading class java/security/cert/PolicyQualifierInfo
+Before loading class sun/security/x509/X509AttributeName
+Before loading class sun/security/util/MemoryCache$SoftCacheEntry
+Before loading class sun/security/util/MemoryCache$CacheEntry
+Before loading class sun/security/x509/PolicyMappingsExtension
+Before loading class sun/security/x509/CertificatePolicyMap
+Before loading class sun/security/x509/NetscapeCertTypeExtension
+Before loading class sun/security/x509/NetscapeCertTypeExtension$MapEntry
+Before loading class sun/security/x509/RFC822Name
+Before loading class sun/reflect/MethodAccessorGenerator
+Before loading class sun/reflect/AccessorGenerator
+Before loading class sun/reflect/ClassFileConstants
+Before loading class java/lang/Void
+Before loading class sun/reflect/ByteVectorFactory
+Before loading class sun/reflect/ByteVectorImpl
+Before loading class sun/reflect/ByteVector
+Before loading class sun/reflect/ClassFileAssembler
+Before loading class sun/reflect/UTF8
+Before loading class sun/reflect/Label
+Before loading class sun/reflect/Label$PatchInfo
+Before loading class java/util/ArrayList$Itr
+Before loading class sun/reflect/MethodAccessorGenerator$1
+Before loading class sun/reflect/ClassDefiner
+Before loading class sun/reflect/ClassDefiner$1
+Before loading class sun/reflect/GeneratedConstructorAccessor1
+Before loading class sun/reflect/BootstrapConstructorAccessorImpl
+Before loading class sun/reflect/GeneratedConstructorAccessor2
+Before loading class sun/reflect/GeneratedConstructorAccessor3
+Before loading class sun/reflect/GeneratedConstructorAccessor4
+Before loading class java/security/AlgorithmParameters
+Before loading class java/security/AlgorithmParametersSpi
+Before loading class java/security/NoSuchAlgorithmException
+Before loading class java/security/GeneralSecurityException
+Before loading class java/security/NoSuchProviderException
+Before loading class sun/security/ec/ECKeyFactory
+Before loading class sun/security/ec/ECKeyFactory$1
+Before loading class sun/security/ec/ECKeyFactory$2
+Before loading class sun/security/ec/ECParameters
+Before loading class sun/security/ec/NamedCurve
+Before loading class java/security/spec/ECParameterSpec
+Before loading class java/security/spec/AlgorithmParameterSpec
+Before loading class java/security/spec/ECFieldFp
+Before loading class java/security/spec/ECField
+Before loading class java/security/spec/EllipticCurve
+Before loading class java/security/spec/ECPoint
+Before loading class java/util/regex/Matcher
+Before loading class java/util/regex/MatchResult
+Before loading class java/util/ArrayList$SubList
+Before loading class java/util/ArrayList$SubList$1
+Before loading class java/util/ListIterator
+Before loading class java/security/spec/ECFieldF2m
+Before loading class java/lang/InstantiationException
+Before loading class sun/security/x509/PrivateKeyUsageExtension
+Before loading class java/security/cert/CertificateException
+Before loading class sun/reflect/GeneratedConstructorAccessor5
+Before loading class sun/security/x509/ExtendedKeyUsageExtension
+Before loading class sun/reflect/GeneratedConstructorAccessor6
+Before loading class sun/reflect/GeneratedConstructorAccessor7
+Before loading class sun/security/x509/NameConstraintsExtension
+Before loading class sun/security/x509/GeneralSubtrees
+Before loading class sun/security/x509/GeneralSubtree
+Before loading class sun/reflect/GeneratedConstructorAccessor8
+Before loading class javax/net/ssl/TrustManagerFactory
+Before loading class javax/net/ssl/TrustManagerFactory$1
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$PKIXFactory
+Before loading class sun/security/ssl/X509TrustManagerImpl
+Before loading class sun/misc/Cleaner
+Enhancing class sun.security.ssl.X509TrustManagerImpl
+Enhancing method (Ljava/lang/String;Ljava/security/cert/X509Certificate;Ljava/lang/String;)V
+javassist.CannotCompileException: [source error] no such class: org.davejingtian.certshim.agent
+	at javassist.CtBehavior.insertBefore(CtBehavior.java:774)
+	at javassist.CtBehavior.insertBefore(CtBehavior.java:734)
+	at org.davejingtian.certshim.agent.Agent$1.transform(Agent.java:66)
+	at sun.instrument.TransformerManager.transform(TransformerManager.java:188)
+	at sun.instrument.InstrumentationImpl.transform(InstrumentationImpl.java:385)
+	at sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory.getInstance(TrustManagerFactoryImpl.java:252)
+	at sun.security.ssl.TrustManagerFactoryImpl.engineInit(TrustManagerFactoryImpl.java:79)
+	at javax.net.ssl.TrustManagerFactory.init(TrustManagerFactory.java:247)
+	at sun.security.ssl.DefaultSSLContextImpl.getDefaultTrustManager(DefaultSSLContextImpl.java:91)
+	at sun.security.ssl.DefaultSSLContextImpl.<init>(DefaultSSLContextImpl.java:57)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:57)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:534)
+	at java.lang.Class.newInstance(Class.java:374)
+	at java.security.Provider$Service.newInstance(Provider.java:1238)
+	at sun.security.jca.GetInstance.getInstance(GetInstance.java:236)
+	at sun.security.jca.GetInstance.getInstance(GetInstance.java:164)
+	at javax.net.ssl.SSLContext.getInstance(SSLContext.java:142)
+	at javax.net.ssl.SSLContext.getDefault(SSLContext.java:85)
+	at javax.net.ssl.SSLSocketFactory.getDefault(SSLSocketFactory.java:119)
+	at SSLSocketClient.main(SSLSocketClient.java:26)
+Caused by: compile error: no such class: org.davejingtian.certshim.agent
+	at javassist.compiler.MemberResolver.searchImports(MemberResolver.java:468)
+	at javassist.compiler.MemberResolver.lookupClass(MemberResolver.java:412)
+	at javassist.compiler.MemberResolver.lookupClassByJvmName(MemberResolver.java:319)
+	at javassist.compiler.TypeChecker.atCallExpr(TypeChecker.java:678)
+	at javassist.compiler.JvstTypeChecker.atCallExpr(JvstTypeChecker.java:157)
+	at javassist.compiler.ast.CallExpr.accept(CallExpr.java:46)
+	at javassist.compiler.CodeGen.doTypeCheck(CodeGen.java:242)
+	at javassist.compiler.CodeGen.atStmnt(CodeGen.java:330)
+	at javassist.compiler.ast.Stmnt.accept(Stmnt.java:50)
+	at javassist.compiler.Javac.compileStmnt(Javac.java:569)
+	at javassist.CtBehavior.insertBefore(CtBehavior.java:754)
+	... 21 more
+Before loading class javax/net/ssl/X509TrustManager
+Before loading class javax/net/ssl/TrustManager
+Before loading class com/sun/net/ssl/internal/ssl/X509ExtendedTrustManager
+Before loading class sun/security/validator/KeyStores
+Before loading class java/util/Hashtable$Enumerator
+Before loading class java/lang/CharacterData00
+Before loading class sun/security/ssl/JsseJce
+Before loading class sun/security/provider/SecureRandom
+Before loading class java/security/MessageDigest
+Before loading class java/security/MessageDigestSpi
+Before loading class sun/security/provider/SHA
+Before loading class sun/security/provider/DigestBase
+Before loading class java/security/MessageDigest$Delegate
+Before loading class sun/security/provider/ByteArrayAccess
+Before loading class sun/security/ssl/SSLSocketFactoryImpl
+Before loading class sun/security/ssl/SSLSocketImpl
+Before loading class sun/security/ssl/BaseSSLSocketImpl
+Before loading class javax/net/ssl/SSLSocket
+Before loading class java/net/Socket
+Before loading class java/net/SocksSocketImpl
+Before loading class java/net/SocksConsts
+Before loading class java/net/PlainSocketImpl
+Before loading class java/net/AbstractPlainSocketImpl
+Before loading class java/net/SocketImpl
+Before loading class java/net/SocketOptions
+Before loading class sun/security/action/LoadLibraryAction
+Before loading class sun/security/ssl/ProtocolVersion
+Before loading class sun/security/ssl/SSLSessionImpl
+Before loading class javax/net/ssl/SSLSession
+Before loading class sun/security/ssl/CipherSuite
+Before loading class sun/security/ssl/CipherSuite$BulkCipher
+Before loading class sun/security/ssl/CipherSuite$MacAlg
+Before loading class sun/security/ssl/CipherSuite$KeyExchange
+Before loading class sun/security/ssl/SessionId
+Before loading class sun/security/ssl/CipherBox
+Before loading class sun/security/ssl/MAC
+Before loading class sun/security/ssl/CipherSuiteList
+Before loading class java/util/TreeSet
+Before loading class java/util/NavigableSet
+Before loading class java/util/SortedSet
+Before loading class java/util/HashMap$ValueIterator
+Before loading class java/security/Signature
+Before loading class java/security/SignatureSpi
+Before loading class sun/security/jca/ServiceId
+Before loading class java/util/Arrays$ArrayList
+Before loading class javax/crypto/spec/SecretKeySpec
+Before loading class javax/crypto/SecretKey
+Before loading class javax/crypto/spec/IvParameterSpec
+Before loading class javax/crypto/Cipher
+Before loading class javax/crypto/Cipher$Transform
+Before loading class javax/crypto/JceSecurity
+Before loading class javax/crypto/JceSecurity$1
+Before loading class javax/crypto/JarVerifier
+Before loading class javax/crypto/CryptoPermissions
+Before loading class java/util/zip/ZipFile$3
+Before loading class java/util/jar/JarFile$1
+Before loading class javax/crypto/CryptoPolicyParser
+Before loading class java/io/StreamTokenizer
+Before loading class javax/crypto/CryptoPolicyParser$GrantEntry
+Before loading class javax/crypto/CryptoPolicyParser$CryptoPermissionEntry
+Before loading class java/util/Vector$1
+Before loading class javax/crypto/CryptoAllPermission
+Before loading class javax/crypto/CryptoPermission
+Before loading class javax/crypto/CryptoAllPermissionCollection
+Before loading class javax/crypto/spec/RC2ParameterSpec
+Before loading class javax/crypto/spec/RC5ParameterSpec
+Before loading class javax/crypto/CryptoPermissionCollection
+Before loading class javax/crypto/JceSecurity$2
+Before loading class com/sun/crypto/provider/AESCipher
+Before loading class javax/crypto/CipherSpi
+Before loading class java/security/InvalidKeyException
+Before loading class java/security/KeyException
+Before loading class com/sun/crypto/provider/SymmetricCipher
+Before loading class com/sun/crypto/provider/AESCrypt
+Before loading class com/sun/crypto/provider/AESConstants
+Before loading class com/sun/crypto/provider/JarVerifier
+Before loading class com/sun/crypto/provider/CipherCore
+Before loading class javax/crypto/IllegalBlockSizeException
+Before loading class com/sun/crypto/provider/FeedbackCipher
+Before loading class com/sun/crypto/provider/CipherBlockChaining
+Before loading class com/sun/crypto/provider/CipherTextStealing
+Before loading class com/sun/crypto/provider/CounterMode
+Before loading class com/sun/crypto/provider/CipherFeedback
+Before loading class com/sun/crypto/provider/OutputFeedback
+Before loading class com/sun/crypto/provider/PCBC
+Before loading class javax/crypto/NoSuchPaddingException
+Before loading class com/sun/crypto/provider/Padding
+Before loading class javax/crypto/BadPaddingException
+Before loading class javax/crypto/ShortBufferException
+Before loading class java/security/spec/InvalidParameterSpecException
+Before loading class java/security/InvalidAlgorithmParameterException
+Before loading class com/sun/crypto/provider/ElectronicCodeBook
+Before loading class com/sun/crypto/provider/PKCS5Padding
+Before loading class javax/crypto/JceSecurityManager
+Before loading class java/lang/SecurityManager
+Before loading class javax/crypto/JceSecurityManager$1
+Before loading class sun/security/util/SecurityConstants
+Before loading class java/awt/AWTPermission
+Before loading class java/net/NetPermission
+Before loading class java/security/SecurityPermission
+Before loading class java/net/SocketPermission
+Before loading class java/net/SocketPermission$1
+Before loading class javax/security/auth/AuthPermission
+Before loading class java/security/AllPermissionCollection
+Before loading class sun/security/ssl/ProtocolList
+Before loading class sun/security/ssl/AppInputStream
+Before loading class sun/security/ssl/InputRecord
+Before loading class sun/security/ssl/Record
+Before loading class sun/security/ssl/AppOutputStream
+Before loading class sun/security/ssl/OutputRecord
+Before loading class java/net/InetSocketAddress
+Before loading class java/net/SocketAddress
+Before loading class java/net/InetAddress
+Before loading class java/net/InetSocketAddress$InetSocketAddressHolder
+Before loading class java/net/InetAddress$InetAddressHolder
+Before loading class java/net/InetAddress$Cache
+Before loading class java/net/InetAddress$Cache$Type
+Before loading class java/net/InetAddressImplFactory
+Before loading class java/net/Inet6AddressImpl
+Before loading class java/net/InetAddressImpl
+Before loading class java/net/InetAddress$1
+Before loading class sun/net/spi/nameservice/NameService
+Before loading class java/net/Inet4AddressImpl
+Before loading class java/net/Inet4Address
+Before loading class sun/net/InetAddressCachePolicy
+Before loading class sun/net/InetAddressCachePolicy$1
+Before loading class sun/security/action/GetIntegerAction
+Before loading class sun/net/InetAddressCachePolicy$2
+Before loading class java/util/LinkedList
+Before loading class java/util/Deque
+Before loading class java/util/Queue
+Before loading class java/util/AbstractSequentialList
+Before loading class java/util/LinkedList$Entry
+Before loading class java/util/LinkedList$ListItr
+Before loading class java/net/InetAddress$CacheEntry
+Before loading class java/net/Inet6Address
+Before loading class java/net/Inet6Address$Inet6AddressHolder
+Before loading class java/net/SocketException
+Before loading class java/net/SocksSocketImpl$5
+Before loading class java/net/ProxySelector
+Before loading class sun/net/spi/DefaultProxySelector
+Before loading class sun/net/spi/DefaultProxySelector$1
+Before loading class sun/net/NetProperties
+Before loading class sun/net/NetProperties$1
+Before loading class sun/net/spi/DefaultProxySelector$NonProxyInfo
+Before loading class java/util/regex/ASCII
+Before loading class java/util/regex/Pattern$GroupCurly
+Before loading class sun/net/spi/DefaultProxySelector$2
+Before loading class java/net/Proxy
+Before loading class java/net/Proxy$Type
+Before loading class java/net/Socket$2
+Before loading class java/net/SocketInputStream
+Before loading class java/net/Socket$3
+Before loading class java/net/SocketOutputStream
+Before loading class sun/security/ssl/ClientHandshaker
+Before loading class sun/security/ssl/Handshaker
+Before loading class sun/security/provider/MD5
+Before loading class sun/security/ssl/HandshakeHash
+Before loading class sun/security/ssl/CloneableDigest
+Before loading class sun/security/ssl/HandshakeInStream
+Before loading class sun/security/ssl/HandshakeOutStream
+Before loading class javax/net/ssl/SSLParameters
+Before loading class java/util/TreeMap$KeySet
+Before loading class java/util/TreeMap$KeyIterator
+Before loading class java/util/TreeMap$PrivateEntryIterator
+getCipherSuites(): [Ljava.lang.String;@3b870cfc
+getNeedClientAuth(): false
+getProtocols(): [Ljava.lang.String;@1f6592ec
+getWantClientAuth(): false
+
+Before loading class java/io/PrintWriter
+Before loading class sun/security/ssl/HandshakeMessage$ClientHello
+Before loading class sun/security/ssl/HandshakeMessage
+Before loading class sun/security/ssl/HelloExtensions
+Before loading class sun/security/ssl/CipherSuiteList$1
+Before loading class sun/security/ssl/RandomCookie
+Before loading class sun/security/ssl/HandshakeMessage$ServerHello
+Before loading class sun/security/ssl/ExtensionType
+Before loading class sun/security/ssl/RenegotiationInfoExtension
+Before loading class sun/security/ssl/HelloExtension
+Before loading class sun/security/ssl/HandshakeMessage$CertificateMsg
+Before loading class sun/security/validator/Validator
+Before loading class sun/security/validator/PKIXValidator
+Before loading class sun/security/validator/EndEntityChecker
+Before loading class java/util/HashMap$KeyIterator
+Before loading class java/security/cert/TrustAnchor
+Before loading class java/security/cert/PKIXBuilderParameters
+Before loading class java/security/cert/PKIXParameters
+Before loading class java/security/cert/CertPathParameters
+Before loading class sun/security/x509/AVAKeyword
+Before loading class sun/security/pkcs/PKCS9Attribute
+Before loading class sun/security/pkcs/SignerInfo
+Before loading class java/text/Normalizer$Form
+Before loading class java/text/Normalizer
+Before loading class sun/text/normalizer/NormalizerBase
+Before loading class sun/text/normalizer/NormalizerBase$Mode
+Before loading class sun/text/normalizer/NormalizerBase$NFDMode
+Before loading class sun/text/normalizer/NormalizerBase$NFKDMode
+Before loading class sun/text/normalizer/NormalizerBase$NFCMode
+Before loading class sun/text/normalizer/NormalizerBase$NFKCMode
+Before loading class sun/text/normalizer/NormalizerBase$QuickCheckResult
+Before loading class sun/text/normalizer/NormalizerBase$1
+Before loading class sun/text/normalizer/NormalizerImpl
+Before loading class sun/text/normalizer/ICUData
+Before loading class sun/text/normalizer/NormalizerDataReader
+Before loading class sun/text/normalizer/ICUBinary$Authenticate
+Before loading class sun/text/normalizer/ICUBinary
+Before loading class sun/text/normalizer/NormalizerImpl$FCDTrieImpl
+Before loading class sun/text/normalizer/Trie$DataManipulate
+Before loading class sun/text/normalizer/NormalizerImpl$NormTrieImpl
+Before loading class sun/text/normalizer/NormalizerImpl$AuxTrieImpl
+Before loading class sun/text/normalizer/IntTrie
+Before loading class sun/text/normalizer/Trie
+Before loading class sun/text/normalizer/CharTrie
+Before loading class sun/text/normalizer/CharTrie$FriendAgent
+Before loading class sun/text/normalizer/UnicodeSet
+Before loading class sun/text/normalizer/UnicodeMatcher
+Before loading class sun/reflect/GeneratedConstructorAccessor9
+Before loading class sun/text/normalizer/NormalizerImpl$DecomposeArgs
+Before loading class java/security/cert/CertPathValidator
+Before loading class java/security/cert/CertPathValidatorSpi
+Before loading class sun/security/provider/certpath/PKIXCertPathValidator
+Before loading class sun/security/provider/certpath/X509CertPath
+Before loading class java/security/cert/CertPath
+Before loading class java/util/Collections$UnmodifiableRandomAccessList
+Before loading class java/util/Collections$UnmodifiableList
+Before loading class sun/security/provider/certpath/PolicyNodeImpl
+Before loading class java/security/cert/PolicyNode
+Before loading class java/util/Collections$SingletonSet
+Before loading class java/util/Collections$1
+Before loading class sun/security/provider/certpath/BasicChecker
+Before loading class java/security/cert/PKIXCertPathChecker
+Before loading class sun/security/provider/certpath/AlgorithmChecker
+Before loading class sun/security/provider/certpath/KeyChecker
+Before loading class sun/security/provider/certpath/ConstraintsChecker
+Before loading class sun/security/provider/certpath/PolicyChecker
+Before loading class sun/security/provider/certpath/UntrustedChecker
+Before loading class sun/security/provider/certpath/PKIXMasterCertPathValidator
+Before loading class java/util/Collections$SynchronizedCollection
+Before loading class java/util/TreeMap$Values
+Before loading class java/util/TreeMap$ValueIterator
+Before loading class sun/security/util/UntrustedCertificates
+Before loading class java/io/PushbackInputStream
+Before loading class sun/misc/CEStreamExhausted
+Before loading class sun/reflect/GeneratedConstructorAccessor10
+Before loading class sun/reflect/GeneratedConstructorAccessor11
+Before loading class sun/security/provider/certpath/OCSPChecker
+Before loading class sun/reflect/UnsafeFieldAccessorFactory
+Before loading class sun/reflect/UnsafeObjectFieldAccessorImpl
+Before loading class java/security/Signature$Delegate
+Before loading class sun/security/rsa/RSASignature$SHA1withRSA
+Before loading class sun/security/rsa/RSASignature
+Before loading class sun/security/rsa/RSAPrivateKeyImpl
+Before loading class sun/security/rsa/RSACore
+Before loading class sun/security/rsa/RSAPadding
+Before loading class java/math/MutableBigInteger
+Before loading class java/security/interfaces/DSAPublicKey
+Before loading class java/security/interfaces/DSAKey
+Before loading class sun/security/rsa/RSASignature$SHA256withRSA
+Before loading class sun/security/provider/SHA2
+Before loading class java/security/cert/PKIXCertPathValidatorResult
+Before loading class java/security/cert/CertPathValidatorResult
+Before loading class java/util/Vector$Itr
+Before loading class sun/security/validator/SimpleValidator
+daveti: algorithm = null
+Before loading class sun/security/ssl/HandshakeMessage$ServerHelloDone
+Before loading class sun/security/ssl/ClientHandshaker$2
+Before loading class sun/security/ssl/RSAClientKeyExchange
+Before loading class javax/crypto/KeyGenerator
+Before loading class com/sun/crypto/provider/TlsRsaPremasterSecretGenerator
+Before loading class javax/crypto/KeyGeneratorSpi
+Before loading class java/lang/IllegalStateException
+Before loading class java/security/InvalidParameterException
+Before loading class sun/security/internal/spec/TlsRsaPremasterSecretParameterSpec
+Before loading class sun/security/internal/spec/TlsMasterSecretParameterSpec
+Before loading class java/util/regex/Pattern$BnM
+Before loading class com/sun/crypto/provider/RSACipher
+Before loading class java/lang/AssertionError
+Before loading class javax/crypto/spec/PSource
+Before loading class javax/crypto/spec/PSource$PSpecified
+Before loading class javax/crypto/NullCipher
+Before loading class com/sun/crypto/provider/TlsMasterSecretGenerator
+Before loading class java/security/DigestException
+Before loading class java/security/ProviderException
+Before loading class com/sun/crypto/provider/TlsPrfGenerator
+Before loading class java/io/UnsupportedEncodingException
+Before loading class com/sun/crypto/provider/TlsMasterSecretGenerator$TlsMasterSecretKey
+Before loading class sun/security/internal/interfaces/TlsMasterSecret
+Before loading class sun/security/internal/spec/TlsKeyMaterialParameterSpec
+Before loading class com/sun/crypto/provider/TlsKeyMaterialGenerator
+Before loading class sun/security/internal/spec/TlsKeyMaterialSpec
+Before loading class sun/security/ssl/HandshakeMessage$Finished
+Before loading class sun/security/internal/spec/TlsPrfParameterSpec
+Before loading class java/util/Collections$SingletonList
+Before loading class com/sun/crypto/provider/ARCFOURCipher
+Before loading class javax/crypto/Mac
+Before loading class com/sun/crypto/provider/HmacSHA1
+Before loading class javax/crypto/MacSpi
+Before loading class com/sun/crypto/provider/HmacCore
+HTTP/1.1 200 OK
+cache-control: no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+content-length: 45604
+content-type: text/html;charset=utf-8
+date: Thu, 08 May 2014 20:23:06 GMT
+expires: Tue, 31 Mar 1981 05:00:00 GMT
+last-modified: Thu, 08 May 2014 20:23:06 GMT
+ms: S
+pragma: no-cache
+server: tfe
+set-cookie: _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCB7zgN1FAToMY3NyZl9p%250AZCIlMDgxODFhNDFhMzhkZmVkMThmYWZhODYzYjVlOWU3ZjA6B2lkIiU4ZmI0%250ANWYxNGM2MTZlYmUyMmEzYWQ0ZjFkOWVjYTJiNg%253D%253D--1bc7c1ee9ba33b74f065bf2301a2e534ec9975ba; Path=/; Domain=.twitter.com; Secure; HTTPOnly
+set-cookie: guest_id=v1%3A139958058677942696; Domain=.twitter.com; Path=/; Expires=Sat, 07-May-2016 20:23:06 UTC
+status: 200 OK
+strict-transport-security: max-age=631138519
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-tfe-logging-request-category: WEB
+x-transaction: 41919176d89cca98
+x-ua-compatible: IE=edge,chrome=1
+x-xss-protection: 1; mode=block
+
+
+
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java -javaagent:certShimAgent.jar SSLSocketClient
+daveti: Agent starts!
+Before loading class SSLSocketClient
+Before loading class com/sun/net/ssl/internal/ssl/Provider
+Before loading class sun/security/ssl/SunJSSE
+Before loading class sun/net/www/protocol/http/Handler
+Before loading class sun/security/ssl/SunJSSE$1
+Before loading class sun/security/jca/ProviderConfig$1
+Before loading class sun/security/jca/ProviderConfig$3
+Before loading class sun/security/rsa/SunRsaSign
+Before loading class sun/security/rsa/SunRsaSignEntries
+Before loading class com/sun/crypto/provider/SunJCE
+Before loading class java/lang/SecurityException
+Before loading class java/security/SecureRandom
+Before loading class java/util/Random
+Before loading class java/util/concurrent/atomic/AtomicLong
+Before loading class java/util/AbstractList$Itr
+Before loading class java/util/LinkedHashMap$EntryIterator
+Before loading class java/util/LinkedHashMap$LinkedHashIterator
+Before loading class java/security/Provider$Service
+Before loading class java/security/Provider$UString
+Before loading class java/util/LinkedHashSet
+Before loading class java/util/HashMap$Values
+Before loading class java/util/LinkedHashMap$ValueIterator
+Before loading class java/util/Collections$UnmodifiableSet
+Before loading class java/util/Collections$UnmodifiableCollection
+Before loading class java/util/Collections$UnmodifiableCollection$1
+Before loading class java/util/HashMap$KeySet
+Before loading class java/util/LinkedHashMap$KeyIterator
+Before loading class sun/security/jca/GetInstance
+Before loading class sun/security/jca/GetInstance$Instance
+Before loading class com/sun/crypto/provider/SunJCE$1
+Before loading class sun/security/jgss/SunProvider
+Before loading class sun/security/jgss/SunProvider$1
+Before loading class com/sun/security/sasl/Provider
+Before loading class com/sun/security/sasl/Provider$1
+Before loading class org/jcp/xml/dsig/internal/dom/XMLDSigRI
+Before loading class org/jcp/xml/dsig/internal/dom/XMLDSigRI$1
+Before loading class sun/security/smartcardio/SunPCSC
+Before loading class sun/security/smartcardio/SunPCSC$1
+Before loading class javax/net/ssl/SSLSocketFactory
+Before loading class javax/net/SocketFactory
+Before loading class javax/net/ssl/SSLSocketFactory$1
+Before loading class javax/net/ssl/SSLContext
+Before loading class javax/net/ssl/SSLContextSpi
+Before loading class sun/security/ssl/DefaultSSLContextImpl
+Before loading class sun/security/ssl/SSLContextImpl
+Before loading class sun/security/ssl/Debug
+Before loading class sun/security/ssl/EphemeralKeyManager
+Before loading class sun/security/ssl/EphemeralKeyManager$EphemeralKeyPair
+Before loading class sun/security/ssl/SSLSessionContextImpl
+Before loading class javax/net/ssl/SSLSessionContext
+Before loading class sun/misc/Cache
+Before loading class sun/misc/CacheEntry
+Before loading class sun/misc/Ref
+Before loading class sun/security/ssl/SSLSessionContextImpl$1
+Before loading class sun/security/ssl/DefaultSSLContextImpl$1
+Before loading class java/security/KeyStore
+Before loading class java/security/KeyStore$1
+Before loading class java/security/KeyStoreSpi
+Before loading class sun/security/provider/JavaKeyStore$JKS
+Before loading class sun/security/provider/JavaKeyStore
+Before loading class javax/net/ssl/KeyManagerFactory
+Before loading class javax/net/ssl/KeyManagerFactory$1
+Before loading class javax/net/ssl/KeyManagerFactorySpi
+Before loading class sun/security/ssl/KeyManagerFactoryImpl$SunX509
+Before loading class sun/security/ssl/KeyManagerFactoryImpl
+Before loading class sun/security/ssl/SunX509KeyManagerImpl
+Before loading class javax/net/ssl/X509ExtendedKeyManager
+Before loading class javax/net/ssl/X509KeyManager
+Before loading class javax/net/ssl/KeyManager
+Before loading class java/util/Collections$EmptyEnumeration
+Before loading class sun/security/ssl/TrustManagerFactoryImpl
+Before loading class javax/net/ssl/TrustManagerFactorySpi
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$2
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$1
+Before loading class java/io/DataInputStream
+Before loading class java/io/DataInput
+Before loading class sun/security/provider/JavaKeyStore$TrustedCertEntry
+Before loading class java/util/Date
+Before loading class sun/util/calendar/CalendarSystem
+Before loading class sun/util/calendar/Gregorian
+Before loading class sun/util/calendar/BaseCalendar
+Before loading class sun/util/calendar/AbstractCalendar
+Before loading class java/security/cert/CertificateFactory
+Before loading class java/security/cert/CertificateFactorySpi
+Before loading class sun/security/provider/X509Factory
+Before loading class sun/security/util/Cache
+Before loading class sun/security/util/MemoryCache
+Before loading class sun/security/util/Cache$EqualByteArray
+Before loading class sun/security/x509/X509CertImpl
+Before loading class sun/security/util/DerEncoder
+Before loading class sun/security/util/DerValue
+Before loading class sun/security/util/DerInputStream
+Before loading class sun/security/util/DerInputBuffer
+Before loading class sun/security/util/DerOutputStream
+Before loading class sun/security/util/ByteArrayLexOrder
+Before loading class sun/security/util/ByteArrayTagOrder
+Before loading class sun/security/x509/AlgorithmId
+Before loading class sun/security/util/ObjectIdentifier
+Before loading class sun/security/x509/X509CertInfo
+Before loading class sun/security/x509/CertAttrSet
+Before loading class java/lang/Integer$IntegerCache
+Before loading class sun/security/x509/CertificateVersion
+Before loading class java/math/BigInteger
+Before loading class sun/security/x509/CertificateSerialNumber
+Before loading class sun/security/x509/SerialNumber
+Before loading class sun/security/x509/CertificateAlgorithmId
+Before loading class sun/security/x509/CertificateIssuerName
+Before loading class sun/security/x509/X500Name
+Before loading class sun/security/x509/GeneralNameInterface
+Before loading class sun/security/x509/X500Name$1
+Before loading class javax/security/auth/x500/X500Principal
+Before loading class sun/security/x509/RDN
+Before loading class sun/security/util/DerIndefLenConverter
+Before loading class sun/security/x509/AVA
+Before loading class sun/security/action/GetBooleanAction
+Before loading class sun/security/x509/CertificateValidity
+Before loading class sun/util/calendar/Gregorian$Date
+Before loading class sun/util/calendar/BaseCalendar$Date
+Before loading class sun/util/calendar/CalendarDate
+Before loading class sun/util/calendar/CalendarUtils
+Before loading class sun/security/x509/CertificateSubjectName
+Before loading class sun/security/x509/CertificateX509Key
+Before loading class sun/security/x509/X509Key
+Before loading class java/security/PublicKey
+Before loading class java/security/Key
+Before loading class sun/security/util/BitArray
+Before loading class java/security/spec/X509EncodedKeySpec
+Before loading class java/security/spec/EncodedKeySpec
+Before loading class java/security/spec/KeySpec
+Before loading class java/security/KeyFactory
+Before loading class sun/security/jca/ProviderList$ServiceList
+Before loading class sun/security/jca/ProviderList$ServiceList$1
+Before loading class sun/security/rsa/RSAKeyFactory
+Before loading class java/security/KeyFactorySpi
+Before loading class java/security/spec/RSAPublicKeySpec
+Before loading class java/security/spec/RSAPrivateKeySpec
+Before loading class java/security/spec/RSAPrivateCrtKeySpec
+Before loading class java/security/spec/PKCS8EncodedKeySpec
+Before loading class sun/security/rsa/RSAPublicKeyImpl
+Before loading class java/security/interfaces/RSAPublicKey
+Before loading class java/security/interfaces/RSAKey
+Before loading class sun/security/rsa/RSAPrivateCrtKeyImpl
+Before loading class java/security/interfaces/RSAPrivateCrtKey
+Before loading class java/security/interfaces/RSAPrivateKey
+Before loading class java/security/PrivateKey
+Before loading class sun/security/pkcs/PKCS8Key
+Before loading class sun/security/x509/CertificateExtensions
+Before loading class java/util/TreeMap
+Before loading class java/util/NavigableMap
+Before loading class java/util/SortedMap
+Before loading class sun/security/x509/Extension
+Before loading class sun/security/x509/OIDMap
+Before loading class sun/security/x509/PKIXExtensions
+Before loading class sun/security/x509/OIDMap$OIDInfo
+Before loading class sun/security/x509/BasicConstraintsExtension
+Before loading class java/util/TreeMap$Entry
+Before loading class sun/security/x509/IssuerAlternativeNameExtension
+Before loading class sun/security/x509/GeneralNames
+Before loading class sun/security/x509/GeneralName
+Before loading class sun/security/x509/DNSName
+Before loading class sun/nio/cs/US_ASCII
+Before loading class sun/nio/cs/US_ASCII$Decoder
+Before loading class sun/security/x509/OtherName
+Before loading class sun/security/x509/SubjectKeyIdentifierExtension
+Before loading class sun/security/x509/KeyIdentifier
+Before loading class sun/security/x509/AuthorityKeyIdentifierExtension
+Before loading class sun/security/x509/KeyUsageExtension
+Before loading class sun/security/x509/SubjectAlternativeNameExtension
+Before loading class sun/security/x509/CRLDistributionPointsExtension
+Before loading class sun/security/x509/DistributionPoint
+Before loading class sun/security/x509/URIName
+Before loading class java/net/URI
+Before loading class java/net/URI$Parser
+Before loading class sun/security/x509/AuthorityInfoAccessExtension
+Before loading class sun/security/x509/AccessDescription
+Before loading class sun/security/x509/CertificatePoliciesExtension
+Before loading class sun/security/x509/PolicyInformation
+Before loading class sun/security/x509/CertificatePolicyId
+Before loading class java/security/cert/PolicyQualifierInfo
+Before loading class sun/security/x509/X509AttributeName
+Before loading class sun/security/util/MemoryCache$SoftCacheEntry
+Before loading class sun/security/util/MemoryCache$CacheEntry
+Before loading class sun/security/x509/PolicyMappingsExtension
+Before loading class sun/security/x509/CertificatePolicyMap
+Before loading class sun/security/x509/NetscapeCertTypeExtension
+Before loading class sun/security/x509/NetscapeCertTypeExtension$MapEntry
+Before loading class sun/security/x509/RFC822Name
+Before loading class sun/reflect/MethodAccessorGenerator
+Before loading class sun/reflect/AccessorGenerator
+Before loading class sun/reflect/ClassFileConstants
+Before loading class java/lang/Void
+Before loading class sun/reflect/ByteVectorFactory
+Before loading class sun/reflect/ByteVectorImpl
+Before loading class sun/reflect/ByteVector
+Before loading class sun/reflect/ClassFileAssembler
+Before loading class sun/reflect/UTF8
+Before loading class sun/reflect/Label
+Before loading class sun/reflect/Label$PatchInfo
+Before loading class java/util/ArrayList$Itr
+Before loading class sun/reflect/MethodAccessorGenerator$1
+Before loading class sun/reflect/ClassDefiner
+Before loading class sun/reflect/ClassDefiner$1
+Before loading class sun/reflect/GeneratedConstructorAccessor1
+Before loading class sun/reflect/BootstrapConstructorAccessorImpl
+Before loading class sun/reflect/GeneratedConstructorAccessor2
+Before loading class sun/reflect/GeneratedConstructorAccessor3
+Before loading class sun/reflect/GeneratedConstructorAccessor4
+Before loading class java/security/AlgorithmParameters
+Before loading class java/security/AlgorithmParametersSpi
+Before loading class java/security/NoSuchAlgorithmException
+Before loading class java/security/GeneralSecurityException
+Before loading class java/security/NoSuchProviderException
+Before loading class sun/security/ec/ECKeyFactory
+Before loading class sun/security/ec/ECKeyFactory$1
+Before loading class sun/security/ec/ECKeyFactory$2
+Before loading class sun/security/ec/ECParameters
+Before loading class sun/security/ec/NamedCurve
+Before loading class java/security/spec/ECParameterSpec
+Before loading class java/security/spec/AlgorithmParameterSpec
+Before loading class java/security/spec/ECFieldFp
+Before loading class java/security/spec/ECField
+Before loading class java/security/spec/EllipticCurve
+Before loading class java/security/spec/ECPoint
+Before loading class java/util/regex/Matcher
+Before loading class java/util/regex/MatchResult
+Before loading class java/util/ArrayList$SubList
+Before loading class java/util/ArrayList$SubList$1
+Before loading class java/util/ListIterator
+Before loading class java/security/spec/ECFieldF2m
+Before loading class java/lang/InstantiationException
+Before loading class sun/security/x509/PrivateKeyUsageExtension
+Before loading class java/security/cert/CertificateException
+Before loading class sun/reflect/GeneratedConstructorAccessor5
+Before loading class sun/security/x509/ExtendedKeyUsageExtension
+Before loading class sun/reflect/GeneratedConstructorAccessor6
+Before loading class sun/reflect/GeneratedConstructorAccessor7
+Before loading class sun/security/x509/NameConstraintsExtension
+Before loading class sun/security/x509/GeneralSubtrees
+Before loading class sun/security/x509/GeneralSubtree
+Before loading class sun/reflect/GeneratedConstructorAccessor8
+Before loading class javax/net/ssl/TrustManagerFactory
+Before loading class javax/net/ssl/TrustManagerFactory$1
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$PKIXFactory
+Before loading class sun/security/ssl/X509TrustManagerImpl
+Before loading class sun/misc/Cleaner
+Enhancing class sun.security.ssl.X509TrustManagerImpl
+Enhancing method (Ljava/lang/String;Ljava/security/cert/X509Certificate;Ljava/lang/String;)V
+Enhanced bytecode
+Before loading class javax/net/ssl/X509TrustManager
+Before loading class javax/net/ssl/TrustManager
+Before loading class com/sun/net/ssl/internal/ssl/X509ExtendedTrustManager
+Before loading class sun/security/validator/KeyStores
+Before loading class java/util/Hashtable$Enumerator
+Before loading class java/lang/CharacterData00
+Before loading class sun/security/ssl/JsseJce
+Before loading class sun/security/provider/SecureRandom
+Before loading class java/security/MessageDigest
+Before loading class java/security/MessageDigestSpi
+Before loading class sun/security/provider/SHA
+Before loading class sun/security/provider/DigestBase
+Before loading class java/security/MessageDigest$Delegate
+Before loading class sun/security/provider/ByteArrayAccess
+Before loading class sun/security/ssl/SSLSocketFactoryImpl
+Before loading class sun/security/ssl/SSLSocketImpl
+Before loading class sun/security/ssl/BaseSSLSocketImpl
+Before loading class javax/net/ssl/SSLSocket
+Before loading class java/net/Socket
+Before loading class java/net/SocksSocketImpl
+Before loading class java/net/SocksConsts
+Before loading class java/net/PlainSocketImpl
+Before loading class java/net/AbstractPlainSocketImpl
+Before loading class java/net/SocketImpl
+Before loading class java/net/SocketOptions
+Before loading class sun/security/action/LoadLibraryAction
+Before loading class sun/security/ssl/ProtocolVersion
+Before loading class sun/security/ssl/SSLSessionImpl
+Before loading class javax/net/ssl/SSLSession
+Before loading class sun/security/ssl/CipherSuite
+Before loading class sun/security/ssl/CipherSuite$BulkCipher
+Before loading class sun/security/ssl/CipherSuite$MacAlg
+Before loading class sun/security/ssl/CipherSuite$KeyExchange
+Before loading class sun/security/ssl/SessionId
+Before loading class sun/security/ssl/CipherBox
+Before loading class sun/security/ssl/MAC
+Before loading class sun/security/ssl/CipherSuiteList
+Before loading class java/util/TreeSet
+Before loading class java/util/NavigableSet
+Before loading class java/util/SortedSet
+Before loading class java/util/HashMap$ValueIterator
+Before loading class java/security/Signature
+Before loading class java/security/SignatureSpi
+Before loading class sun/security/jca/ServiceId
+Before loading class java/util/Arrays$ArrayList
+Before loading class javax/crypto/spec/SecretKeySpec
+Before loading class javax/crypto/SecretKey
+Before loading class javax/crypto/spec/IvParameterSpec
+Before loading class javax/crypto/Cipher
+Before loading class javax/crypto/Cipher$Transform
+Before loading class javax/crypto/JceSecurity
+Before loading class javax/crypto/JceSecurity$1
+Before loading class javax/crypto/JarVerifier
+Before loading class javax/crypto/CryptoPermissions
+Before loading class java/util/zip/ZipFile$3
+Before loading class java/util/jar/JarFile$1
+Before loading class javax/crypto/CryptoPolicyParser
+Before loading class java/io/StreamTokenizer
+Before loading class javax/crypto/CryptoPolicyParser$GrantEntry
+Before loading class javax/crypto/CryptoPolicyParser$CryptoPermissionEntry
+Before loading class java/util/Vector$1
+Before loading class javax/crypto/CryptoAllPermission
+Before loading class javax/crypto/CryptoPermission
+Before loading class javax/crypto/CryptoAllPermissionCollection
+Before loading class javax/crypto/spec/RC2ParameterSpec
+Before loading class javax/crypto/spec/RC5ParameterSpec
+Before loading class javax/crypto/CryptoPermissionCollection
+Before loading class javax/crypto/JceSecurity$2
+Before loading class com/sun/crypto/provider/AESCipher
+Before loading class javax/crypto/CipherSpi
+Before loading class java/security/InvalidKeyException
+Before loading class java/security/KeyException
+Before loading class com/sun/crypto/provider/SymmetricCipher
+Before loading class com/sun/crypto/provider/AESCrypt
+Before loading class com/sun/crypto/provider/AESConstants
+Before loading class com/sun/crypto/provider/JarVerifier
+Before loading class com/sun/crypto/provider/CipherCore
+Before loading class com/sun/crypto/provider/FeedbackCipher
+Before loading class com/sun/crypto/provider/CipherBlockChaining
+Before loading class com/sun/crypto/provider/CipherTextStealing
+Before loading class com/sun/crypto/provider/CounterMode
+Before loading class com/sun/crypto/provider/CipherFeedback
+Before loading class com/sun/crypto/provider/OutputFeedback
+Before loading class com/sun/crypto/provider/PCBC
+Before loading class javax/crypto/IllegalBlockSizeException
+Before loading class javax/crypto/NoSuchPaddingException
+Before loading class com/sun/crypto/provider/Padding
+Before loading class javax/crypto/BadPaddingException
+Before loading class javax/crypto/ShortBufferException
+Before loading class java/security/spec/InvalidParameterSpecException
+Before loading class java/security/InvalidAlgorithmParameterException
+Before loading class com/sun/crypto/provider/ElectronicCodeBook
+Before loading class com/sun/crypto/provider/PKCS5Padding
+Before loading class javax/crypto/JceSecurityManager
+Before loading class java/lang/SecurityManager
+Before loading class javax/crypto/JceSecurityManager$1
+Before loading class sun/security/util/SecurityConstants
+Before loading class java/awt/AWTPermission
+Before loading class java/net/NetPermission
+Before loading class java/security/SecurityPermission
+Before loading class java/net/SocketPermission
+Before loading class java/net/SocketPermission$1
+Before loading class javax/security/auth/AuthPermission
+Before loading class java/security/AllPermissionCollection
+Before loading class sun/security/ssl/ProtocolList
+Before loading class sun/security/ssl/AppInputStream
+Before loading class sun/security/ssl/InputRecord
+Before loading class sun/security/ssl/Record
+Before loading class sun/security/ssl/AppOutputStream
+Before loading class sun/security/ssl/OutputRecord
+Before loading class java/net/InetSocketAddress
+Before loading class java/net/SocketAddress
+Before loading class java/net/InetAddress
+Before loading class java/net/InetSocketAddress$InetSocketAddressHolder
+Before loading class java/net/InetAddress$InetAddressHolder
+Before loading class java/net/InetAddress$Cache
+Before loading class java/net/InetAddress$Cache$Type
+Before loading class java/net/InetAddressImplFactory
+Before loading class java/net/Inet6AddressImpl
+Before loading class java/net/InetAddressImpl
+Before loading class java/net/InetAddress$1
+Before loading class sun/net/spi/nameservice/NameService
+Before loading class java/net/Inet4AddressImpl
+Before loading class java/net/Inet4Address
+Before loading class sun/net/InetAddressCachePolicy
+Before loading class sun/net/InetAddressCachePolicy$1
+Before loading class sun/security/action/GetIntegerAction
+Before loading class sun/net/InetAddressCachePolicy$2
+Before loading class java/util/LinkedList
+Before loading class java/util/Deque
+Before loading class java/util/Queue
+Before loading class java/util/AbstractSequentialList
+Before loading class java/util/LinkedList$Entry
+Before loading class java/util/LinkedList$ListItr
+Before loading class java/net/InetAddress$CacheEntry
+Before loading class java/net/Inet6Address
+Before loading class java/net/Inet6Address$Inet6AddressHolder
+Before loading class java/net/SocketException
+Before loading class java/net/SocksSocketImpl$5
+Before loading class java/net/ProxySelector
+Before loading class sun/net/spi/DefaultProxySelector
+Before loading class sun/net/spi/DefaultProxySelector$1
+Before loading class sun/net/NetProperties
+Before loading class sun/net/NetProperties$1
+Before loading class sun/net/spi/DefaultProxySelector$NonProxyInfo
+Before loading class java/util/regex/ASCII
+Before loading class java/util/regex/Pattern$GroupCurly
+Before loading class sun/net/spi/DefaultProxySelector$2
+Before loading class java/net/Proxy
+Before loading class java/net/Proxy$Type
+Before loading class java/net/Socket$2
+Before loading class java/net/SocketInputStream
+Before loading class java/net/Socket$3
+Before loading class java/net/SocketOutputStream
+Before loading class sun/security/ssl/ClientHandshaker
+Before loading class sun/security/ssl/Handshaker
+Before loading class sun/security/provider/MD5
+Before loading class sun/security/ssl/HandshakeHash
+Before loading class sun/security/ssl/CloneableDigest
+Before loading class sun/security/ssl/HandshakeInStream
+Before loading class sun/security/ssl/HandshakeOutStream
+Before loading class javax/net/ssl/SSLParameters
+Before loading class java/util/TreeMap$KeySet
+Before loading class java/util/TreeMap$KeyIterator
+Before loading class java/util/TreeMap$PrivateEntryIterator
+getCipherSuites(): [Ljava.lang.String;@4edfa6f0
+getNeedClientAuth(): false
+getProtocols(): [Ljava.lang.String;@3d48ff04
+getWantClientAuth(): false
+
+Before loading class java/io/PrintWriter
+Before loading class sun/security/ssl/HandshakeMessage$ClientHello
+Before loading class sun/security/ssl/HandshakeMessage
+Before loading class sun/security/ssl/HelloExtensions
+Before loading class sun/security/ssl/CipherSuiteList$1
+Before loading class sun/security/ssl/RandomCookie
+Before loading class sun/security/ssl/HandshakeMessage$ServerHello
+Before loading class sun/security/ssl/ExtensionType
+Before loading class sun/security/ssl/RenegotiationInfoExtension
+Before loading class sun/security/ssl/HelloExtension
+Before loading class sun/security/ssl/HandshakeMessage$CertificateMsg
+Before loading class sun/security/validator/Validator
+Before loading class sun/security/validator/PKIXValidator
+Before loading class sun/security/validator/EndEntityChecker
+Before loading class java/util/HashMap$KeyIterator
+Before loading class java/security/cert/TrustAnchor
+Before loading class java/security/cert/PKIXBuilderParameters
+Before loading class java/security/cert/PKIXParameters
+Before loading class java/security/cert/CertPathParameters
+Before loading class sun/security/x509/AVAKeyword
+Before loading class sun/security/pkcs/PKCS9Attribute
+Before loading class sun/security/pkcs/SignerInfo
+Before loading class java/text/Normalizer$Form
+Before loading class java/text/Normalizer
+Before loading class sun/text/normalizer/NormalizerBase
+Before loading class sun/text/normalizer/NormalizerBase$Mode
+Before loading class sun/text/normalizer/NormalizerBase$NFDMode
+Before loading class sun/text/normalizer/NormalizerBase$NFKDMode
+Before loading class sun/text/normalizer/NormalizerBase$NFCMode
+Before loading class sun/text/normalizer/NormalizerBase$NFKCMode
+Before loading class sun/text/normalizer/NormalizerBase$QuickCheckResult
+Before loading class sun/text/normalizer/NormalizerBase$1
+Before loading class sun/text/normalizer/NormalizerImpl
+Before loading class sun/text/normalizer/ICUData
+Before loading class sun/text/normalizer/NormalizerDataReader
+Before loading class sun/text/normalizer/ICUBinary$Authenticate
+Before loading class sun/text/normalizer/ICUBinary
+Before loading class sun/text/normalizer/NormalizerImpl$FCDTrieImpl
+Before loading class sun/text/normalizer/Trie$DataManipulate
+Before loading class sun/text/normalizer/NormalizerImpl$NormTrieImpl
+Before loading class sun/text/normalizer/NormalizerImpl$AuxTrieImpl
+Before loading class sun/text/normalizer/IntTrie
+Before loading class sun/text/normalizer/Trie
+Before loading class sun/text/normalizer/CharTrie
+Before loading class sun/text/normalizer/CharTrie$FriendAgent
+Before loading class sun/text/normalizer/UnicodeSet
+Before loading class sun/text/normalizer/UnicodeMatcher
+Before loading class sun/reflect/GeneratedConstructorAccessor9
+Before loading class sun/text/normalizer/NormalizerImpl$DecomposeArgs
+Before loading class java/security/cert/CertPathValidator
+Before loading class java/security/cert/CertPathValidatorSpi
+Before loading class sun/security/provider/certpath/PKIXCertPathValidator
+Before loading class sun/security/provider/certpath/X509CertPath
+Before loading class java/security/cert/CertPath
+Before loading class java/util/Collections$UnmodifiableRandomAccessList
+Before loading class java/util/Collections$UnmodifiableList
+Before loading class sun/security/provider/certpath/PolicyNodeImpl
+Before loading class java/security/cert/PolicyNode
+Before loading class java/util/Collections$SingletonSet
+Before loading class java/util/Collections$1
+Before loading class sun/security/provider/certpath/BasicChecker
+Before loading class java/security/cert/PKIXCertPathChecker
+Before loading class sun/security/provider/certpath/AlgorithmChecker
+Before loading class sun/security/provider/certpath/KeyChecker
+Before loading class sun/security/provider/certpath/ConstraintsChecker
+Before loading class sun/security/provider/certpath/PolicyChecker
+Before loading class sun/security/provider/certpath/UntrustedChecker
+Before loading class sun/security/provider/certpath/PKIXMasterCertPathValidator
+Before loading class java/util/Collections$SynchronizedCollection
+Before loading class java/util/TreeMap$Values
+Before loading class java/util/TreeMap$ValueIterator
+Before loading class sun/security/util/UntrustedCertificates
+Before loading class java/io/PushbackInputStream
+Before loading class sun/misc/CEStreamExhausted
+Before loading class sun/reflect/GeneratedConstructorAccessor10
+Before loading class sun/reflect/GeneratedConstructorAccessor11
+Before loading class sun/security/provider/certpath/OCSPChecker
+Before loading class sun/reflect/UnsafeFieldAccessorFactory
+Before loading class sun/reflect/UnsafeObjectFieldAccessorImpl
+Before loading class java/security/Signature$Delegate
+Before loading class sun/security/rsa/RSASignature$SHA1withRSA
+Before loading class sun/security/rsa/RSASignature
+Before loading class sun/security/rsa/RSAPrivateKeyImpl
+Before loading class sun/security/rsa/RSACore
+Before loading class sun/security/rsa/RSAPadding
+Before loading class java/math/MutableBigInteger
+Before loading class java/security/interfaces/DSAPublicKey
+Before loading class java/security/interfaces/DSAKey
+Before loading class sun/security/rsa/RSASignature$SHA256withRSA
+Before loading class sun/security/provider/SHA2
+Before loading class java/security/cert/PKIXCertPathValidatorResult
+Before loading class java/security/cert/CertPathValidatorResult
+Before loading class java/util/Vector$Itr
+Before loading class sun/security/validator/SimpleValidator
+daveti
+twitter.com
+null
+daveti: algorithm = HTTPS
+Before loading class sun/security/util/HostnameChecker
+Before loading class sun/net/util/IPAddressUtil
+Before loading class sun/security/ssl/HandshakeMessage$ServerHelloDone
+Before loading class sun/security/ssl/ClientHandshaker$2
+Before loading class sun/security/ssl/RSAClientKeyExchange
+Before loading class javax/crypto/KeyGenerator
+Before loading class com/sun/crypto/provider/TlsRsaPremasterSecretGenerator
+Before loading class javax/crypto/KeyGeneratorSpi
+Before loading class java/lang/IllegalStateException
+Before loading class java/security/InvalidParameterException
+Before loading class sun/security/internal/spec/TlsRsaPremasterSecretParameterSpec
+Before loading class sun/security/internal/spec/TlsMasterSecretParameterSpec
+Before loading class java/util/regex/Pattern$BnM
+Before loading class com/sun/crypto/provider/RSACipher
+Before loading class java/lang/AssertionError
+Before loading class javax/crypto/spec/PSource
+Before loading class javax/crypto/spec/PSource$PSpecified
+Before loading class javax/crypto/NullCipher
+Before loading class com/sun/crypto/provider/TlsMasterSecretGenerator
+Before loading class java/security/DigestException
+Before loading class java/security/ProviderException
+Before loading class com/sun/crypto/provider/TlsPrfGenerator
+Before loading class java/io/UnsupportedEncodingException
+Before loading class com/sun/crypto/provider/TlsMasterSecretGenerator$TlsMasterSecretKey
+Before loading class sun/security/internal/interfaces/TlsMasterSecret
+Before loading class sun/security/internal/spec/TlsKeyMaterialParameterSpec
+Before loading class com/sun/crypto/provider/TlsKeyMaterialGenerator
+Before loading class sun/security/internal/spec/TlsKeyMaterialSpec
+Before loading class sun/security/ssl/HandshakeMessage$Finished
+Before loading class sun/security/internal/spec/TlsPrfParameterSpec
+Before loading class java/util/Collections$SingletonList
+Before loading class com/sun/crypto/provider/ARCFOURCipher
+Before loading class javax/crypto/Mac
+Before loading class com/sun/crypto/provider/HmacSHA1
+Before loading class javax/crypto/MacSpi
+Before loading class com/sun/crypto/provider/HmacCore
+HTTP/1.1 200 OK
+cache-control: no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+content-length: 45604
+content-type: text/html;charset=utf-8
+date: Thu, 08 May 2014 22:35:55 GMT
+expires: Tue, 31 Mar 1981 05:00:00 GMT
+last-modified: Thu, 08 May 2014 22:35:55 GMT
+ms: A
+pragma: no-cache
+server: tfe
+set-cookie: _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoHaWQiJWJkZTIzMDUxZDQ1NjhiMjA5Y2NmZjFh%250AMzc5MDllZjBmOg9jcmVhdGVkX2F0bCsIlIz63UUBOgxjc3JmX2lkIiU1Mzk5%250AMGI0NjdmNDIwOGZjNWYxYmNkYTQ5NjdhY2MwOA%253D%253D--8e854867778087d853f1a77dbd6b649332324eb2; Path=/; Domain=.twitter.com; Secure; HTTPOnly
+set-cookie: guest_id=v1%3A139958855589548521; Domain=.twitter.com; Path=/; Expires=Sat, 07-May-2016 22:35:55 UTC
+status: 200 OK
+strict-transport-security: max-age=631138519
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-tfe-logging-request-category: WEB
+x-transaction: 2cad56e6ddede37c
+x-ua-compatible: IE=edge,chrome=1
+x-xss-protection: 1; mode=block
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="lt-ie10 ie8" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if IE 9]><html class="lt-ie10 ie9" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en" data-scribe-reduced-action-queue="true"><!--<![endif]-->
+  <head>
+    
+    
+    
+    
+    
+    
+    
+    <meta charset="utf-8">
+    
+    
+  <script id="resolve_inline_redirects">
+    (function(){function b(){var a=window.location.href.match(/#(.)(.*)$/);return a&&a[1]=="!"&&a[2].replace(/^\//,"")}function c(b){if(!b)return!1;b=decodeURI(b.replace(/^#|\/$/,"")).toLowerCase();return b.match(a)?b:!1}function d(a){var a=c(a);if(a){var b=document
+.referrer||"none",d="ev_redir_"+encodeURIComponent(a)+"="+b+"; path=/";document.cookie=d;window.location.replace("/hashtag/"+a)}}function e(){var a=b();a&&window.location.replace("//"+window.location.host+"/"+a);window.location.hash!=""&&d(window.location.
+hash.substr(1).toLowerCase())}var a=/^[a-z0-9_À-ÖØ-öø-ÿĀ-ɏɓ-ɔɖ-ɗəɛɣɨɯɲʉʋʻ̀-ͯḀ-ỿЀ-ӿԀ-ԧⷠ-ⷿꙀ-֑ꚟ-ֿׁ-ׂׄ-ׇׅא-תװ-״﬒-ﬨשׁ-זּטּ-לּמּנּ-סּףּ-פּצּ-ﭏؐ-ؚؠ-ٟٮ-ۓە-ۜ۞-۪ۨ-ۯۺ-ۼۿݐ-ݿࢠࢢ-ࢬࣤ-ࣾﭐ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻﹰ-ﹴﹶ-ﻼ‌ก-ฺเ-๎ᄀ-ᇿ㄰-ㆅꥠ-꥿가-힯ힰ-퟿ﾡ-ￜァ-ヺー-ヾｦ-ﾟｰ０-９Ａ-Ｚａ-ｚぁ-ゖ゙-ゞ㐀-䶿一-鿿꜀-뜿띀-렟-﨟〃々〻]*[a-z_À-ÖØ-öø-ÿĀ-ɏɓ-ɔɖ-ɗəɛɣɨɯɲʉʋʻ̀-ͯḀ-ỿЀ-ӿԀ-ԧⷠ-ⷿꙀ-֑ꚟ-ֿׁ-ׂׄ-ׇׅא-תװ-״﬒-ﬨשׁ-זּטּ-לּמּנּ-סּףּ-פּצּ-ﭏؐ-ؚؠ-ٟٮ-ۓە-ۜ۞-۪ۨ-ۯۺ-ۼۿݐ-ݿࢠࢢ-ࢬࣤ-ࣾﭐ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻﹰ-ﹴﹶ-ﻼ‌ก-ฺเ-๎ᄀ-ᇿ㄰-ㆅꥠ-꥿가-힯ힰ-퟿ﾡ-ￜァ-ヺー-ヾｦ-ﾟｰ０-９Ａ-Ｚａ-ｚぁ-ゖ゙-ゞ㐀-䶿一-鿿꜀-뜿띀-렟-﨟〃々〻][a-z0-9_À-ÖØ-öø-ÿĀ-ɏɓ-ɔɖ-ɗəɛɣɨɯɲʉʋʻ̀-ͯḀ-ỿЀ-ӿԀ-ԧⷠ-ⷿꙀ-֑ꚟ-ֿׁ-ׂׄ-ׇׅא-תװ-״﬒-ﬨשׁ-זּטּ-לּמּנּ-סּףּ-פּצּ-ﭏؐ-ؚؠ-ٟٮ-ۓە-ۜ۞-۪ۨ-ۯۺ-ۼۿݐ-ݿࢠࢢ-ࢬࣤ-ࣾﭐ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻﹰ-ﹴﹶ-ﻼ‌ก-ฺเ-๎ᄀ-ᇿ㄰-ㆅꥠ-꥿가-힯ힰ-퟿ﾡ-ￜァ-ヺー-ヾｦ-ﾟｰ０-９Ａ-Ｚａ-ｚぁ-ゖ゙-ゞ㐀-䶿一-鿿꜀-뜿띀-렟-﨟〃々〻]+$/
+;e();window.addEventListener?window.addEventListener("hashchange",e,!1):window.attachEvent&&window.attachEvent("onhashchange",e)})();
+  </script>
+  <script id="swift_action_queue">
+    (function(){function m(a){a||(a=window.event);if(!a)return!1;a.timestamp=(new Date).getTime();!a.target&&a.srcElement&&(a.target=a.srcElement);if(document.documentElement.getAttribute("data-scribe-reduced-action-queue")){var b=a.target;while(b&&b!=document
+.body){if(b.tagName=="A")return;b=b.parentNode}}r("all",s(a));if(!q(a)){r("direct",a);return!0}document.addEventListener||(a=s(a));a.preventDefault=a.stopPropagation=a.stopImmediatePropagation=function(){};if(i){f.push(a);r("captured",a)}else r("ignored",a
+);return!1}function n($){p();for(var a=0,b;b=f[a];a++){var d=$(b.target),e=d.closest("a")[0];if(b.type=="click"&&e){var g=$.data(e,"events"),i=g&&g.click,j=!e.hostname.match(c)||!e.href.match(/#$/);if(!i&&j){window.location=e.href;continue}}d.trigger(b)}window
+.swiftActionQueue.wasFlushed=!0}function o(){for(var a in j){if(a=="all")continue;var b=j[a];for(var c=0;c<b.length;c++)console.log("actionQueue",u(b[c]))}}function p(){clearTimeout(g);for(var a=0,b;b=e[a];a++)document["on"+b]=null}function q(a){if(!a.target
+)return!1;var b=a.target,e=(b.tagName||"").toLowerCase();if(a.metaKey)return!1;if(a.shiftKey&&e=="a")return!1;if(b.hostname&&!b.hostname.match(c))return!1;if(a.type.match(d)&&w(b))return!1;if(e=="label"){var f=b.getAttribute("for");if(f){var g=document.getElementById
+(f);if(g&&v(g))return!1}else for(var i=0,j;j=b.childNodes[i];i++)if(v(j))return!1}return!0}function r(a,b){b.bucket=a;j[a].push(b)}function s(a){var b={};for(var c in a)b[c]=a[c];return b}function t(a){while(a&&a!=document.body){if(a.tagName=="A")return a;
+a=a.parentNode}}function u(b){var c=[];b.bucket&&c.push("["+b.bucket+"]");c.push(b.type);var d=b.target,e=t(d),f="",g,i,j=b.timestamp&&b.timestamp-a;if(b.type==="click"&&e){g=e.className.trim().replace(/\s+/g,".");i=e.id.trim();f=/[^#]$/.test(e.href)?" ("+
+e.href+")":"";d='"'+e.innerText.replace(/\n+/g," ").trim()+'"'}else{g=d.className.trim().replace(/\s+/g,".");i=d.id.trim();d=d.tagName.toLowerCase();b.keyCode&&(d=String.fromCharCode(b.keyCode)+" : "+d)}c.push(d+f+(i&&"#"+i)+(!i&&g?"."+g:""));j&&c.push(j);
+return c.join(" ")}function v(a){var b=(a.tagName||"").toLowerCase();return b=="input"&&a.getAttribute("type")=="checkbox"}function w(a){var b=(a.tagName||"").toLowerCase();return b=="textarea"||b=="input"&&a.getAttribute("type")=="text"||a.getAttribute("contenteditable"
+)=="true"}var a=(new Date).getTime(),b=1e4,c=/^([^\.]+\.)*twitter\.com$/,d=/^key/,e=["click","keydown","keypress","keyup"],f=[],g=null,i=!0,j={captured:[],ignored:[],direct:[],all:[]};for(var k=0,l;l=e[k];k++)document["on"+l]=m;g=setTimeout(function(){i=!1
+},b);window.swiftActionQueue={buckets:j,flush:n,logActions:o,wasFlushed:!1}})();
+  </script>
+  <script id="composition_state">
+    (function(){function a(a){a.target.setAttribute("data-in-composition","true")}function b(a){a.target.removeAttribute("data-in-composition")}if(document.addEventListener){document.addEventListener("compositionstart",a,!1);document.addEventListener("compositionend"
+,b,!1)}})();
+  </script>
+
+        <link rel="stylesheet" href="https://abs.twimg.com/a/1399447933/css/t1/highline_rosetta_core.bundle.css">
+
+    <link rel="stylesheet" href="https://abs.twimg.com/a/1399447933/css/t1/rosetta_logged_out.bundle.css">
+    <link rel="stylesheet" href="https://abs.twimg.com/a/1399447933/css/t1/highline_logged_out.bundle.css">
+
+
+      <title>Twitter</title>
+    
+  <meta name="robots" content="NOODP">
+  <meta name="description" content="Instantly connect to what&#39;s most important to you. Follow your friends, experts, favorite celebrities, and breaking news.">
+
+
+
+<meta name="msapplication-TileImage" content="//abs.twimg.com/favicons/win8-tile-144.png"/>
+<meta name="msapplication-TileColor" content="#00aced"/>
+
+  <link href="//abs.twimg.com/favicons/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+
+  <meta name="swift-page-name" id="swift-page-name" content="front">
+
+    <link rel="canonical" href="https://twitter.com/">
+
+
+
+<link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="Twitter">
+
+          <link rel="stylesheet" href="https://abs.twimg.com/a/1399447933/css/t1/rosetta_more.bundle.css">
+      <link rel="stylesheet" href="https://abs.twimg.com/a/1399447933/css/t1/highline_more.bundle.css">
+
+  </head>
+  <body class="highline three-col logged-out mobile-callout front-page" 
+data-fouc-class-names="swift-loading"
+ dir="ltr">
+      <script id="swift_loading_indicator">
+        document.body.className=document.body.className+" "+document.body.getAttribute("data-fouc-class-names");
+      </script>
+    <div id="doc" class="">
+        <div class="topbar js-topbar">
+  <div id="banners" class="js-banners">
+  </div>
+  <div class="global-nav" data-section-term="top_nav">
+    <div class="global-nav-inner">
+      <div class="container">
+
+        
+         <ul class="nav js-global-actions"> <li class="home" data-global-action="t1home">  <a class="nav-logo-link" href="/" data-nav="front"> <span class="Icon Icon--bird"><span class="visuallyhidden">Twitter</span></span> </a>   </li> </ul>  <div class="pull-right">  <ul class="nav secondary-nav language-dropdown"> <li class="dropdown js-language-dropdown"> <a href="#supported_languages" class="dropdown-toggle js-dropdown-toggle"> <small>Language:</small> <span class="js-current-language">English</span> <b class="caret"></b> </a> <div class="dropdown-menu"> <div class="dropdown-caret right"> <span class="caret-outer"> </span> <span class="caret-inner"></span> </div> <ul id="supported_languages">  <li><a href="?lang=id" data-lang-code="id" title="Indonesian" class="js-language-link js-tooltip">Bahasa Indonesia</a></li>  <li><a href="?lang=msa" data-lang-code="msa" title="Malay" class="js-language-link js-tooltip">Bahasa Melayu</a></li>  <li><a href="?lang=da" data-lang-code="da" title="Danish" class="js-language-link js-tooltip">Dansk</a></li>  <li><a href="?lang=de" data-lang-code="de" title="German" class="js-language-link js-tooltip">Deutsch</a></li>  <li><a href="?lang=en-gb" data-lang-code="en-gb" title="English UK" class="js-language-link js-tooltip">EnglishUK</a></li>  <li><a href="?lang=es" data-lang-code="es" title="Spanish" class="js-language-link js-tooltip">Español</a></li>  <li><a href="?lang=eu" data-lang-code="eu" title="Basque" class="js-language-link js-tooltip">Euskara</a></li>  <li><a href="?lang=fil" data-lang-code="fil" title="Filipino" class="js-language-link js-tooltip">Filipino</a></li>  <li><a href="?lang=gl" data-lang-code="gl" title="Galician" class="js-language-link js-tooltip">Galego</a></li>  <li><a href="?lang=it" data-lang-code="it" title="Italian" class="js-language-link js-tooltip">Italiano</a></li>  <li><a href="?lang=xx-lc" data-lang-code="xx-lc" title="Lolcat" class="js-language-link js-tooltip">LOLCATZ</a></li>  <li><a href="?lang=hu" data-lang-code="hu" title="Hungarian" class="js-language-link js-tooltip">Magyar</a></li>  <li><a href="?lang=nl" data-lang-code="nl" title="Dutch" class="js-language-link js-tooltip">Nederlands</a></li>  <li><a href="?lang=no" data-lang-code="no" title="Norwegian" class="js-language-link js-tooltip">Norsk</a></li>  <li><a href="?lang=pl" data-lang-code="pl" title="Polish" class="js-language-link js-tooltip">Polski</a></li>  <li><a href="?lang=pt" data-lang-code="pt" title="Portuguese" class="js-language-link js-tooltip">Português</a></li>  <li><a href="?lang=fi" data-lang-code="fi" title="Finnish" class="js-language-link js-tooltip">Suomi</a></li>  <li><a href="?lang=sv" data-lang-code="sv" title="Swedish" class="js-language-link js-tooltip">Svenska</a></li>  <li><a href="?lang=tr" data-lang-code="tr" title="Turkish" class="js-language-link js-tooltip">Türkçe</a></li>  <li><a href="?lang=ca" data-lang-code="ca" title="Catalan" class="js-language-link js-tooltip">català</a></li>  <li><a href="?lang=fr" data-lang-code="fr" title="French" class="js-language-link js-tooltip">français</a></li>  <li><a href="?lang=ro" data-lang-code="ro" title="Romanian" class="js-language-link js-tooltip">română</a></li>  <li><a href="?lang=cs" data-lang-code="cs" title="Czech" class="js-language-link js-tooltip">Čeština</a></li>  <li><a href="?lang=el" data-lang-code="el" title="Greek" class="js-language-link js-tooltip">Ελληνικά</a></li>  <li><a href="?lang=ru" data-lang-code="ru" title="Russian" class="js-language-link js-tooltip">Русский</a></li>  <li><a href="?lang=uk" data-lang-code="uk" title="Ukrainian" class="js-language-link js-tooltip">Українська мова</a></li>  <li><a href="?lang=he" data-lang-code="he" title="Hebrew" class="js-language-link js-tooltip">עִבְרִית</a></li>  <li><a href="?lang=ur" data-lang-code="ur" title="Urdu" class="js-language-link js-tooltip">اردو</a></li>  <li><a href="?lang=ar" data-lang-code="ar" title="Arabic" class="js-language-link js-tooltip">العربية</a></li>  <li><a href="?lang=fa" data-lang-code="fa" title="Farsi" class="js-language-link js-tooltip">فارسی</a></li>  <li><a href="?lang=hi" data-lang-code="hi" title="Hindi" class="js-language-link js-tooltip">हिन्दी</a></li>  <li><a href="?lang=th" data-lang-code="th" title="Thai" class="js-language-link js-tooltip">ภาษาไทย</a></li>  <li><a href="?lang=ja" data-lang-code="ja" title="Japanese" class="js-language-link js-tooltip">日本語</a></li>  <li><a href="?lang=zh-cn" data-lang-code="zh-cn" title="Simplified Chinese" class="js-language-link js-tooltip">简体中文</a></li>  <li><a href="?lang=zh-tw" data-lang-code="zh-tw" title="Traditional Chinese" class="js-language-link js-tooltip">繁體中文</a></li>  <li><a href="?lang=ko" data-lang-code="ko" title="Korean" class="js-language-link js-tooltip">한국어</a></li>  </ul> </div> <div class="js-front-language"> <form action="/sessions/change_locale" class="t1-form language" method="POST"> <input type="hidden" name="lang"> <input type="hidden" name="redirect"> <input type="hidden" name="authenticity_token" value="ebbd479a8c99d6747cb877560f9ed55071c77a60"> </form> </div> </li> </ul>   </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+        <div id="page-outer">
+          <div id="page-container" class="AppContent  wrapper-front white">
+              
+
+
+
+
+
+            <div class="front-container  " id="front-container">
+
+  <noscript>
+  <div class="front-warning">
+    <h3>Twitter.com makes heavy use of JavaScript</h3>
+    <p>If you cannot enable it in your browser's preferences, you may have a better experience on our <a href="http://m.twitter.com">mobile site</a>.</p>
+  </div>
+</noscript>
+
+<div class="front-warning" id="front-no-cookies-warn">
+  <h3>Twitter.com makes heavy use of browser cookies</h3>
+  <p>Please enable cookies in your browser preferences before signing in.</p>
+</div>
+
+
+
+
+
+
+        
+<div class="front-card">
+  <div class="front-welcome ">
+    <div class="phone-image"></div>
+    <div class="callout-copy">
+      <h1>Welcome to Twitter.</h1>
+      <p>Start a conversation, explore your interests, and be in the know.</p>
+    </div>
+    <div class="store-links ">
+      <a href="https://itunes.apple.com/us/app/twitter/id333903271?mt=8" class="store-button app-store" target="_blank">Download on the App Store</a>
+      <a href="https://play.google.com/store/apps/details?id=com.twitter.android&amp;referrer=utm_source%3Dsignin%26utm_medium%3Dtwitterdotcom%26utm_content%3Dstratos%26utm_campaign%3Dloggedout" class="store-button google-play" target="_blank">Android app on Google play</a>
+    </div>
+    <p class="devices-link"><a href="https://about.twitter.com/products">View other devices</a></p>
+  </div>
+
+  <div class="front-signin js-front-signin">
+  <form action="https://twitter.com/sessions" class="t1-form signin" method="post">
+    <div class="username">
+      <input type="text" id="signin-email" class="text-input email-input" name="session[username_or_email]" autocomplete="on" placeholder="Username or email">
+    </div>
+
+    <table class="flex-table password-signin">
+      <tbody>
+      <tr>
+        <td class="flex-table-primary">
+          <div class="password flex-table-form">
+            <input type="password" id="signin-password" class="text-input flex-table-input" name="session[password]" placeholder="Password">
+          </div>
+        </td>
+        <td class="flex-table-secondary">
+          <button type="submit" class="submit btn primary-btn flex-table-btn js-submit">
+            Sign in
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="remember-forgot">
+      <label class="remember">
+        <input type="checkbox" value="1" name="remember_me" checked="checked">
+        <span>Remember me</span>
+      </label>
+      <span class="separator">&middot;</span>
+      <a class="forgot" href="/account/resend_password">Forgot password?</a>
+    </div>
+
+    <input type="hidden" name="return_to_ssl" value="true">
+
+    <input type="hidden" name="scribe_log">
+    <input type="hidden" name="redirect_after_login" value="/">
+    <input type="hidden" value="ebbd479a8c99d6747cb877560f9ed55071c77a60" name="authenticity_token">
+  </form>
+</div>
+
+  <div class="front-signup js-front-signup ">
+  <h2><strong>New to Twitter?</strong> Sign up</h2>
+
+  <form action="https://twitter.com/signup" class="t1-form signup" id="frontpage-signup-form" method="post">
+
+    <div class="field">
+      <input type="text" class="text-input" autocomplete="off" name="user[name]" maxlength="20" placeholder="Full name">
+    </div>
+    <div class="field">
+      <input type="text" class="text-input email-input" autocomplete="off" name="user[email]" placeholder="Email">
+    </div>
+    <div class="field">
+      <input type="password" class="text-input" name="user[user_password]" placeholder="Password">
+    </div>
+
+
+    <input type="hidden" value="" name="context">
+    <input type="hidden" value="ebbd479a8c99d6747cb877560f9ed55071c77a60" name="authenticity_token">
+    <button type="submit" class="btn signup-btn u-pullRight">
+      Sign up for Twitter
+    </button>
+  </form>
+</div>
+
+</div>
+
+
+
+  <div class="footer inline-list ">
+  <ul>
+    <li><a href="/about">About</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="//support.twitter.com">Help</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="https://blog.twitter.com">Blog</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="http://status.twitter.com">Status</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="/jobs">Jobs</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="/tos">Terms</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="/privacy">Privacy</a><span class="dot divider"> &middot;</span></li>
+      <li><a href="//support.twitter.com/articles/20170514">Cookies</a><span class="dot divider"> &middot;</span></li>
+      <li><a href="//support.twitter.com/articles/20170451">Ads info</a><span class="dot divider"> &middot;</span></li>
+      <li><a href="//about.twitter.com/press/brand-assets">Brand</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="//ads.twitter.com/start?ref=gl-tw-tw-twitter-advertise">Advertise</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="https://business.twitter.com">Businesses</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="//media.twitter.com">Media</a><span class="dot divider"> &middot;</span></li>
+    <li><a href="//dev.twitter.com">Developers</a><span class="dot divider"> &middot;</span></li>
+      <li><a href="/i/directory/profiles">Directory</a><span class="dot divider"> &middot;</span></li>
+    <li><span class="copyright">&copy; 2014 Twitter</span></li>
+  </ul>
+</div>
+
+
+</div>
+
+          </div>
+        </div>
+      
+    </div>
+    <div class="alert-messages hidden" id="message-drawer">
+    <div class="message ">
+  <div class="message-inside">
+    <span class="message-text"></span>
+      <a role="button" class="Icon Icon--close Icon--medium dismiss" href="#">
+        <span class="visuallyhidden">Dismiss</span>
+      </a>
+  </div>
+</div>
+</div>
+
+    
+
+<div class="gallery-overlay"></div>
+<div class="Gallery">
+  <div class="Gallery-closeTarget"></div>
+  <div class="Gallery-content">
+    <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--large">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+    <div class="Gallery-media"></div>
+    <div class="GalleryNav GalleryNav--prev">
+      <span class="GalleryNav-handle GalleryNav-handle--prev">
+        <span class="Icon Icon--caretLeft Icon--large">
+          <span class="u-isHiddenVisually">
+            Previous
+          </span>
+        </span>
+      </span>
+    </div>
+    <div class="GalleryNav GalleryNav--next">
+      <span class="GalleryNav-handle GalleryNav-handle--next">
+        <span class="Icon Icon--caretRight Icon--large">
+          <span class="u-isHiddenVisually">
+            Next
+          </span>
+        </span>
+      </span>
+    </div>
+    <div class="GalleryTweet"></div>
+  </div>
+</div>
+
+
+
+<div class="modal-overlay"></div>
+
+
+
+
+<div id="goto-user-dialog" class="modal-container">
+  <div class="modal modal-small draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+
+      <div class="modal-header">
+        <h3 class="modal-title">Go to a person's profile</h3>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-inner">
+          <form class="t1-form goto-user-form">
+            <input class="input-block username-input" type="text" placeholder="Start typing a name to jump to a profile" aria-label="User">
+            
+
+
+<div role="listbox" aria-hidden="true" class="dropdown-menu typeahead">
+  <div aria-hidden="true" class="dropdown-caret">
+    <div class="caret-outer"></div>
+    <div class="caret-inner"></div>
+  </div>
+  <div role="presentation" class="dropdown-inner js-typeahead-results">
+    <div role="presentation" class="typeahead-saved-searches">
+  <h3 id="saved-searches-heading" class="typeahead-category-title saved-searches-title">Saved searches</h3>
+  <ul role="presentation" class="typeahead-items saved-searches-list">
+    
+    <li role="presentation" class="typeahead-item typeahead-saved-search-item">
+      <span class="icon close" aria-hidden="true"><span class="visuallyhidden">Remove</span></span>
+      <a role="option" aria-describedby="saved-searches-heading" class="js-nav" href="" data-search-query="" data-query-source="" data-ds="saved_search" tabindex="-1"></a>
+    </li>
+  </ul>
+</div>
+
+    <ul role="presentation" class="typeahead-items typeahead-topics">
+  
+  <li role="presentation" class="typeahead-item typeahead-topic-item">
+    <a role="option" class="js-nav" href="" data-search-query="" data-query-source="typeahead_click" data-ds="topics" tabindex="-1">
+    </a>
+  </li>
+</ul>
+
+
+    
+
+
+<ul role="presentation" class="typeahead-items typeahead-accounts js-typeahead-accounts">
+  
+  <li role="presentation" data-user-id="" data-user-screenname="" data-remote="true" data-score="" class="typeahead-item typeahead-account-item js-selectable">
+    
+    <a role="option" class="js-nav" data-query-source="typeahead_click" data-search-query="" data-ds="account">
+      <img class="avatar size24" alt="">
+      <span class="typeahead-user-item-info">
+        <span class="fullname"></span>
+        <span class="js-verified hidden"><span class="Icon Icon--verified Icon--small"><span class="u-isHiddenVisually">Verified account</span></span></span>
+        <span class="username"><s>@</s><b></b></span>
+      </span>
+    </a>
+  </li>
+  <li role="presentation" class="js-selectable typeahead-accounts-shortcut js-shortcut"><a role="option" class="js-nav" href="" data-search-query="" data-query-source="typeahead_click" data-shortcut="true" data-ds="account_search"></a></li>
+</ul>
+
+    <ul role="presentation" class="typeahead-items typeahead-trend-locations-list">
+  
+  <li role="presentation" class="typeahead-item typeahead-trend-locations-item"><a role="option" class="js-nav" href="" data-ds="trend_location" data-search-query="" tabindex="-1"></a></li>
+</ul>
+    <ul role="presentation" class="typeahead-items typeahead-context-list">
+  
+  <li role="presentation" class="typeahead-item typeahead-context-item"><a role="option" class="js-nav" href="" data-ds="context_helper" data-search-query="" tabindex="-1"></a></li>
+</ul>
+    <div role="presentation" class="typeahead-user-select">
+  <div role="presentation" class="typeahead-empty-suggestions">
+    Suggested users
+  </div>
+  <ul role="presentation" class="typeahead-items typeahead-selected js-typeahead-selected">
+    
+    <li role="presentation" data-user-id="" data-user-screenname="" data-remote="true" data-score="" class="typeahead-item typeahead-selected-item js-selectable">
+      
+      <a role="option" class="js-nav" data-query-source="typeahead_click" data-search-query="" data-ds="account">
+        <img class="avatar size24" alt="">
+        <span class="typeahead-user-item-info">
+          <span class="fullname"></span>
+          <span class="js-verified hidden"><span class="Icon Icon--verified Icon--small"><span class="u-isHiddenVisually">Verified account</span></span></span>
+          <span class="username"><s>@</s><b></b></span>
+          <span class="deselect-user js-deselect-user Icon Icon--close"></span>
+        </span>
+      </a>
+    </li>
+    <li role="presentation" class="typeahead-selected-end"></li>
+  </ul>
+
+  <ul role="presentation" class="typeahead-items typeahead-accounts js-typeahead-accounts">
+    
+    <li role="presentation" data-user-id="" data-user-screenname="" data-remote="true" data-score="" class="typeahead-item typeahead-account-item js-selectable">
+      
+      <a role="option" class="js-nav" data-query-source="typeahead_click" data-search-query="" data-ds="account">
+        <img class="avatar size24" alt="">
+        <span class="typeahead-user-item-info">
+          <span class="fullname"></span>
+          <span class="js-verified hidden"><span class="Icon Icon--verified Icon--small"><span class="u-isHiddenVisually">Verified account</span></span></span>
+          <span class="username"><s>@</s><b></b></span>
+          <span class="deselect-user js-deselect-user Icon Icon--close"></span>
+        </span>
+      </a>
+    </li>
+    <li role="presentation" class="typeahead-accounts-end"></li>
+  </ul>
+</div>
+  </div>
+</div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+  <div id="retweet-tweet-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+
+      <div class="modal-header">
+        <h3 class="modal-title">Retweet this to your followers?</h3>
+      </div>
+
+      <div class="tweet-loading">
+  <div class="spinner-bigger"></div>
+</div>
+
+      <div class="modal-body modal-tweet"></div>
+
+      <div class="modal-footer">
+        <button class="btn cancel-action js-close">Cancel</button>
+        <button class="btn primary-btn retweet-action">Retweet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div id="delete-tweet-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+
+      <div class="modal-header">
+        <h3 class="modal-title">Are you sure you want to delete this Tweet?</h3>
+      </div>
+
+      <div class="tweet-loading">
+  <div class="spinner-bigger"></div>
+</div>
+
+      <div class="modal-body modal-tweet"></div>
+
+      <div class="modal-footer">
+        <button class="btn cancel-action js-close">Cancel</button>
+        <button class="btn primary-btn delete-action">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="block-user-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+
+      <div class="modal-header">
+        <h3 class="modal-title">Block</h3>
+      </div>
+
+      <div class="tweet-loading">
+  <div class="spinner-bigger"></div>
+</div>
+
+      <div class="modal-body modal-tweet"></div>
+
+      <div class="modal-footer">
+        <button class="btn cancel-action js-close">Cancel</button>
+        <button class="btn primary-btn block-action">Block</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  
+  
+
+     <div id="geo-disabled-dropdown">
+      <div class="dropdown-menu" tabindex="-1">
+  <div class="dropdown-caret">
+    <span class="caret-outer"></span>
+    <span class="caret-inner"></span>
+  </div>
+  <ul>
+    <li class="geo-not-enabled-yet">
+      <h2>Add a location to your Tweets</h2>
+      <p>
+        When you tweet with a location, Twitter stores that location.&#32;
+        You can switch location on/off before each Tweet and always have the option to delete your location history.
+        <a href="http://support.twitter.com/forums/26810/entries/78525" target="_blank">Learn more</a>
+      </p>
+      <div>
+        <button type="button" class="geo-turn-on btn primary-btn">Turn location on</button>
+        <button type="button" class="geo-not-now btn-link">Not now</button>
+      </div>
+    </li>
+  </ul>
+</div>
+    </div>
+
+  <div id="geo-enabled-dropdown">
+    <div class="dropdown-menu" tabindex="-1">
+  <div class="dropdown-caret">
+    <span class="caret-outer"></span>
+    <span class="caret-inner"></span>
+  </div>
+  <ul>
+    <li class="geo-query-location">
+      <input type="text" autocomplete="off" placeholder="Search for a neighborhood or city">
+      <span class="icon generic-search"></span>
+    </li>
+    <li class="geo-dropdown-status"></li>
+    <li class="dropdown-link geo-turn-off-item geo-focusable">
+      <span class="icon close"></span>Turn off location
+    </li>
+  </ul>
+</div>
+  </div>
+
+
+  <div id="profile_popup" class="modal-container ProfilePopupContainer">
+  <div class="close-modal-background-target"></div>
+  <div class="modal modal-small draggable">
+    <div class="modal-content clearfix">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+      <div class="modal-header">
+        <h3 class="modal-title">Profile summary</h3>
+      </div>
+
+      <div class="modal-body profile-modal">
+
+      </div>
+
+      <div class="loading">
+        <span class="spinner-bigger"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div id="list-membership-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal modal-small draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+      <div class="modal-header">
+        <h3 class="modal-title">Your lists</h3>
+      </div>
+      <div class="modal-body">
+        <div class="list-membership-content"></div>
+        <span class="spinner lists-spinner" title="Loading&hellip;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+  <div id="list-operations-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal modal-medium draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+      <div class="modal-header">
+        <h3 class="modal-title">Create a new list</h3>
+      </div>
+      <div class="modal-body">
+        
+<div class="list-editor">
+  <div class="field">
+    <label for="list-name">List name</label>
+    <input id="list-name" type="text" class="text" name="name" value="" />
+  </div>
+  <hr/>
+
+  <div class="field">
+    <label for="list-description">Description</label>
+    <textarea id="list-description" name="description"></textarea>
+    <span class="help-text">Under 100 characters, optional</span>
+  </div>
+  <hr/>
+
+  <fieldset class="field">
+    <legend class="t1-legend">Privacy</legend>
+    <div class="options">
+      <label for="list-public-radio">
+        <input class="radio" type="radio" name="mode" id="list-public-radio" value="public" checked="checked"  />
+        <b>Public</b> &middot; Anyone can follow this list
+      </label>
+      <label for="list-private-radio">
+        <input class="radio" type="radio" name="mode" id="list-private-radio" value="private"  />
+        <b>Private</b> &middot; Only you can access this list
+      </label>
+    </div>
+  </fieldset>
+  <hr/>
+
+  <div class="list-editor-save">
+    <button type="button" class="btn btn-primary update-list-button" data-list-id="">Save list</button>
+  </div>
+
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div id="activity-popup-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal draggable">
+    <div class="modal-content clearfix">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+      </div>
+
+      <div class="modal-body">
+        <div class="tweet-loading">
+  <div class="spinner-bigger"></div>
+</div>
+
+        <div class="activity-tweet modal-tweet clearfix"></div>
+        <div class="loading">
+          <span class="spinner-bigger"></span>
+        </div>
+        <div class="activity-content clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <div id="embed-tweet-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal modal-medium draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+      <div class="modal-header">
+        <h3 class="modal-title">Embed this Tweet</h3>
+      </div>
+      <div class="modal-body">
+        <div class="embed-code-container">
+  <p>Add this Tweet to your website by copying the code below. <a href="//dev.twitter.com/docs/embedded-tweets">Learn more</a></p>
+  <form class="t1-form">
+
+    <div class="embed-destination-wrapper">
+      <div class="embed-overlay embed-overlay-spinner"><div class="embed-overlay-content"></div></div>
+      <div class="embed-overlay embed-overlay-error">
+        <p class="embed-overlay-content">Hmm, there was a problem reaching the server. <button type="button" class="btn-link retry-embed">Try again?</button></p>
+      </div>
+      <textarea class="embed-destination js-initial-focus"></textarea>
+      <div class="embed-options">
+        <div class="embed-include-parent-tweet">
+          <label for="include-parent-tweet">
+            <input type="checkbox" id="include-parent-tweet" class="include-parent-tweet" checked>
+            Include parent Tweet
+          </label>
+        </div>
+        <div class="embed-include-card">
+          <label for="include-card">
+            <input type="checkbox" id="include-card" class="include-card" checked>
+            Include media
+          </label>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="embed-preview">
+    <h3>Preview</h3>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+  <div id="signin-or-signup-dialog">
+    <div id="signin-or-signup" class="modal-container">
+      <div class="close-modal-background-target"></div>
+      <div class="modal modal-medium draggable">
+        <div class="modal-content">
+          <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+          <div class="modal-header">
+            <h3 class="modal-title modal-long-title signup-only">Sign up for Twitter &amp; follow @<span></span></h3>
+            <h3 class="modal-title not-signup-only">Sign in to Twitter</h3>
+          </div>
+          <div class="modal-body signup-only">
+            <form action="https://twitter.com/signup" class="t1-form clearfix signup" method="post">
+  <div class="field name">
+    <input type="text" autocomplete="off" name="user[name]" maxlength="20" class="js-initial-focus" placeholder="Full name">
+  </div>
+  <div class="field email">
+    <input class="email-input" type="text" autocomplete="off" name="user[email]" placeholder="Email">
+  </div>
+  <div class="field password">
+    <input type="password" name="user[user_password]" placeholder="Password">
+  </div>
+  <input type="hidden" value="" name="context">
+  <input type="hidden" value="ebbd479a8c99d6747cb877560f9ed55071c77a60" name="authenticity_token"/>
+  <input name="follows" type="hidden" value="">
+  <input type="submit" class="btn signup-btn js-submit js-signup-btn" value="Sign up">
+</form>
+
+          </div>
+          <div class="modal-body not-signup-only">
+            <form action="https://twitter.com/sessions" class="t1-form signin" method="post">
+  <fieldset>
+
+  <legend class="visuallyhidden">Sign In</legend>
+
+  <div class="clearfix field">
+    <input class="js-username-field email-input js-initial-focus" type="text" name="session[username_or_email]" autocomplete="on" value="" placeholder="Username or email">
+  </div>
+
+  <div class="clearfix field">
+    <input class="js-password-field" type="password" name="session[password]" placeholder="Password">
+  </div>
+
+  <input type="hidden" value="ebbd479a8c99d6747cb877560f9ed55071c77a60" name="authenticity_token"/>
+
+</fieldset>
+
+  <div class="clearfix">
+
+  <input type="hidden" name="scribe_log">
+  <input type="hidden" name="redirect_after_login" value="/">
+  <input type="hidden" value="ebbd479a8c99d6747cb877560f9ed55071c77a60" name="authenticity_token"/>
+  <button type="submit" class="submit btn primary-btn">Sign in</button>
+
+  <div class="subchck">
+    <label class="remember">
+      <input type="checkbox" value="1" name="remember_me" checked="checked">
+      Remember me
+      <span class="separator">·</span>
+      <a class="forgot" href="/account/resend_password">Forgot password?</a>
+    </label>
+  </div>
+</div>
+
+  <div class="divider"></div>
+  <p>
+    <a class="forgot" href="/account/resend_password">Forgot password?</a><br />
+    <a class="mobile has-sms" href="/account/complete">Already using Twitter via text message?</a>
+  </p>
+</form>
+
+            <div class="signup">
+              <h2>Not on Twitter? Sign up, tune into the things you care about, and get updates as they happen.</h2>
+              <form action="https://twitter.com/signup" class="t1-form signup" method="get">
+  <button class="btn promotional signup-btn" type="submit">Sign up &raquo;</button>
+</form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sms-codes-dialog" class="modal-container">
+  <div class="close-modal-background-target"></div>
+  <div class="modal modal-medium draggable">
+    <div class="modal-content">
+      <button type="button" class="modal-btn modal-close js-close">
+  <span class="Icon Icon--close Icon--medium">
+    <span class="visuallyhidden">Close</span>
+  </span>
+</button>
+
+      <div class="modal-header">
+        <h3 class="modal-title">Two-way (sending and receiving) short codes:</h3>
+      </div>
+      <div class="modal-body">
+        
+<table id="sms_codes" cellpadding="0" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Country</th>
+      <th>Code</th>
+      <th>For customers of</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>United States</td>
+      <td>40404</td>
+      <td>(any)</td>
+    </tr>
+    <tr>
+      <td>Canada</td>
+      <td>21212</td>
+      <td>(any)</td>
+    </tr>
+    <tr>
+      <td>United Kingdom</td>
+      <td>86444</td>
+      <td>Vodafone, Orange, 3, O2</td>
+    </tr>
+    <tr>
+      <td>Brazil</td>
+      <td>40404</td>
+      <td>Nextel, TIM</td>
+    </tr>
+    <tr>
+      <td>Haiti</td>
+      <td>40404</td>
+      <td>Digicel, Voila</td>
+    </tr>
+    <tr>
+      <td>Ireland</td>
+      <td>51210</td>
+      <td>Vodafone, O2</td>
+    </tr>
+    <tr>
+      <td>India</td>
+      <td>53000</td>
+      <td>Bharti Airtel, Videocon, Reliance</td>
+    </tr>
+    <tr>
+      <td>Indonesia</td>
+      <td>89887</td>
+      <td>AXIS, 3, Telkomsel, Indosat, XL Axiata</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Italy</td>
+      <td>4880804</td>
+      <td>Wind</td>
+    </tr>
+    <tr>
+      <td>3424486444</td>
+      <td>Vodafone</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3">
+        &raquo; <a class="js-initial-focus" target="_blank" href="http://support.twitter.com/articles/14226-how-to-find-your-twitter-short-code-or-long-code">See SMS short codes for other countries</a>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div id="create-custom-timeline-dialog" class="modal-container"></div>
+<div id="edit-custom-timeline-dialog" class="modal-container"></div>
+<div id="curate-dialog" class="modal-container"></div>
+
+
+    <div class="hidden" id="hidden-content">
+  <iframe aria-hidden="true" class="tweet-post-iframe" name="tweet-post-iframe"></iframe>
+  <form class="t1-form media-upload-form" method="post">
+    <input type="hidden" name="authenticity_token" class="auth-token">
+    <input type="hidden" name="iframe_callback" class="iframe-callback">
+    <input type="hidden" name="media" class="media">
+    <input type="hidden" name="origin" class="origin">
+  </form>
+
+</div>
+
+    
+    <div id="spoonbill-outer"></div>
+  </body>
+</html>
+  <input type="hidden" id="init-data" class="json-data" value="{&quot;profileHoversEnabled&quot;:false,&quot;noNewDedup&quot;:false,&quot;permalinkOverlayEnabled&quot;:false,&quot;baseFoucClass&quot;:&quot;swift-loading&quot;,&quot;bodyFoucClassNames&quot;:&quot;swift-loading&quot;,&quot;macawSwift&quot;:true,&quot;assetsBasePath&quot;:&quot;https:\/\/abs.twimg.com\/a\/1399447933\/&quot;,&quot;assetVersionKey&quot;:&quot;15088b&quot;,&quot;environment&quot;:&quot;production&quot;,&quot;formAuthenticityToken&quot;:&quot;ebbd479a8c99d6747cb877560f9ed55071c77a60&quot;,&quot;loggedIn&quot;:false,&quot;screenName&quot;:null,&quot;fullName&quot;:null,&quot;userId&quot;:null,&quot;scribeBufferSize&quot;:3,&quot;pageName&quot;:&quot;front&quot;,&quot;sectionName&quot;:&quot;front&quot;,&quot;scribeParameters&quot;:{},&quot;internalReferer&quot;:null,&quot;geoEnabled&quot;:false,&quot;typeaheadData&quot;:{&quot;accounts&quot;:{&quot;localQueriesEnabled&quot;:false,&quot;remoteQueriesEnabled&quot;:false,&quot;enabled&quot;:false,&quot;limit&quot;:6},&quot;trendLocations&quot;:{&quot;enabled&quot;:false},&quot;savedSearches&quot;:{&quot;enabled&quot;:false,&quot;items&quot;:[]},&quot;dmAccounts&quot;:{&quot;enabled&quot;:false,&quot;localQueriesEnabled&quot;:false,&quot;onlyDMable&quot;:true,&quot;remoteQueriesEnabled&quot;:false},&quot;selectedUsers&quot;:{&quot;enabled&quot;:false},&quot;prefillUsers&quot;:{&quot;enabled&quot;:false},&quot;topics&quot;:{&quot;enabled&quot;:false,&quot;localQueriesEnabled&quot;:false,&quot;prefetchLimit&quot;:500,&quot;remoteQueriesEnabled&quot;:false,&quot;limit&quot;:4},&quot;concierge&quot;:{&quot;enabled&quot;:false,&quot;localQueriesEnabled&quot;:true,&quot;remoteQueriesEnabled&quot;:false,&quot;prefetchLimit&quot;:500,&quot;limit&quot;:3},&quot;recentSearches&quot;:{&quot;enabled&quot;:false},&quot;contextHelpers&quot;:{&quot;enabled&quot;:false,&quot;page_name&quot;:&quot;front&quot;,&quot;section_name&quot;:&quot;front&quot;,&quot;screen_name&quot;:null},&quot;hashtags&quot;:{&quot;enabled&quot;:false,&quot;localQueriesEnabled&quot;:false,&quot;prefetchLimit&quot;:500,&quot;remoteQueriesEnabled&quot;:false},&quot;showSearchAccountSocialContext&quot;:false,&quot;showTypeaheadTopicSocialContext&quot;:false,&quot;showDebugInfo&quot;:false,&quot;useThrottle&quot;:true,&quot;accountsOnTop&quot;:false,&quot;remoteDebounceInterval&quot;:300,&quot;remoteThrottleInterval&quot;:300,&quot;reverseBoldingEnabled&quot;:false,&quot;tweetContextEnabled&quot;:false,&quot;fullNameMatchingInCompose&quot;:true,&quot;topicsWithFiltersEnabled&quot;:false},&quot;pushStatePageLimit&quot;:500000,&quot;routes&quot;:{&quot;profile&quot;:&quot;\/&quot;},&quot;pushState&quot;:true,&quot;viewContainer&quot;:&quot;#page-container&quot;,&quot;asyncSocialProof&quot;:true,&quot;dragAndDropPhotoUpload&quot;:true,&quot;href&quot;:&quot;\/&quot;,&quot;searchPathWithQuery&quot;:&quot;\/search?q=query&amp;src=typd&quot;,&quot;timelineCardsGallery&quot;:true,&quot;mediaGrid&quot;:true,&quot;deciders&quot;:{&quot;pushState&quot;:true,&quot;disable_profile_popup&quot;:false,&quot;hqImageUploads&quot;:false,&quot;mqImageUploads&quot;:false,&quot;largeHeaderImageUpload&quot;:false,&quot;dynamicLoadMediaForward&quot;:true,&quot;scribeActionQueue&quot;:false,&quot;scribeReducedActionQueue&quot;:true,&quot;custom_timeline_curation&quot;:false,&quot;async_upload&quot;:true,&quot;multi_compose&quot;:false},&quot;experiments&quot;:{&quot;reply140&quot;:false},&quot;permalinkCardsGallery&quot;:false,&quot;toasts_dm&quot;:false,&quot;toasts_spoonbill&quot;:false,&quot;toasts_timeline&quot;:false,&quot;toasts_dm_poll_scale&quot;:60,&quot;uploadDomain&quot;:&quot;upload.twitter.com&quot;,&quot;lifelineAlertEnabled&quot;:false,&quot;freezeDashboard&quot;:false,&quot;swift_dm_create&quot;:false,&quot;passwordResetAdvancedLoginForm&quot;:false,&quot;enableActivity&quot;:true,&quot;inlineValidationEnabled&quot;:false,&quot;webSingleStepBucket&quot;:null,&quot;initialState&quot;:{&quot;title&quot;:&quot;Twitter&quot;,&quot;section&quot;:null,&quot;module&quot;:&quot;app\/pages\/frontpage&quot;,&quot;cache_ttl&quot;:300,&quot;body_class_names&quot;:&quot;highline three-col logged-out mobile-callout front-page&quot;,&quot;doc_class_names&quot;:null,&quot;route_name&quot;:&quot;&quot;,&quot;page_container_class_names&quot;:&quot;AppContent  wrapper-front white&quot;,&quot;ttft_navigation&quot;:false}}">
+
+  
+
+    <input type="hidden" class="swift-boot-module" value="app/pages/frontpage">
+  <input type="hidden" id="swift-module-path" value="https://abs.twimg.com/c/swift/en">
+
+  
+    <script src="https://abs.twimg.com/c/swift/en/init.e20f7a3fdb347c6f175898eee1d209433049b0f3.js" async></script>
+
+Before loading class java/util/IdentityHashMap$KeySet
+Before loading class java/util/IdentityHashMap$KeyIterator
+Before loading class java/util/IdentityHashMap$IdentityHashMapIterator
+Before loading class java/io/DeleteOnExitHook
+root@daveti-virtual-machine:~/java# ll
+total 652
+drwxr-xr-x 3 root root   4096 May  8 14:29 ./
+drwx------ 6 root root   4096 May  8 15:35 ../
+-rw-r--r-- 1 root root 639427 May  8 15:35 certShimAgent.jar
+-rw-r--r-- 1 root root     91 May  8 00:23 manifest.txt
+drwxr-xr-x 3 root root   4096 May  7 23:46 org/
+-rw-r--r-- 1 root root   2357 May  7 22:35 SSLSocketClient.class
+-rw-r--r-- 1 root root   1713 May  7 22:14 SSLSocketClient.java
+root@daveti-virtual-machine:~/java# /root/openjdk6_hack/build/linux-amd64/j2sdk-image/bin/java -javaagent:certShimAgent.jar SSLSocketClient^C
+root@daveti-virtual-machine:~/java# 
+

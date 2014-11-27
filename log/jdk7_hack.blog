@@ -1,0 +1,866 @@
+1. Download
+
+2. Hack
+
+3. Build
+
+4. Fix cacerts
+
+5. Run
+root@daveti-virtual-machine:~/java7ssl# /root/jdk7u60/build/linux-amd64/j2sdk-image/bin/java SSLSocketClient
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+daveti - getEndpointIdentificationAlgorithm: identificationAlgorithm [null]
+getCipherSuites(): [Ljava.lang.String;@270b5037
+getNeedClientAuth(): false
+getProtocols(): [Ljava.lang.String;@57bf5ee7
+getWantClientAuth(): false
+getEndpointIdentificationAlgorithm() [1.7]: null
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+daveti - getEndpointIdentificationAlgorithm: identificationAlgorithm [null]
+daveti - checkTrusted(socket): identityAlg [null]
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+HTTP/1.1 200 OK
+cache-control: no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+content-length: 45699
+content-type: text/html;charset=utf-8
+date: Sun, 11 May 2014 17:23:18 GMT
+expires: Tue, 31 Mar 1981 05:00:00 GMT
+last-modified: Sun, 11 May 2014 17:23:18 GMT
+ms: S
+pragma: no-cache
+server: tfe
+set-cookie: _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlMTg4NmVlZGRlZjNlNTM2NjZh%250ANGZkZWFlNTJkYzA0Zjg6B2lkIiU4MDFiYjFkNmZjODVmZDYxZWRlMTY3NDQ1%250AMWNkN2M0MToPY3JlYXRlZF9hdGwrCAFpT%252BxFAQ%253D%253D--b8033b61b706e8609a04c8f472e849cb88366fb1; Path=/; Domain=.twitter.com; Secure; HTTPOnly
+set-cookie: guest_id=v1%3A139982899839892100; Domain=.twitter.com; Path=/; Expires=Tue, 10-May-2016 17:23:18 UTC
+status: 200 OK
+strict-transport-security: max-age=631138519
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-tfe-logging-request-category: WEB
+x-transaction: ab0458886d530434
+x-ua-compatible: IE=edge,chrome=1
+x-xss-protection: 1; mode=block
+
+<!DOCTYPE html>
+
+6. Build Javassist
+root@daveti-virtual-machine:~/git/javassist7/javassist# export JAVA_HOME=/root/jdk7u60/build/linux-amd64/j2sdk-image
+root@daveti-virtual-machine:~/git/javassist7/javassist# ant
+Buildfile: /root/git/javassist7/javassist/build.xml
+
+prepare:
+    [mkdir] Created dir: /root/git/javassist7/javassist/target
+    [mkdir] Created dir: /root/git/javassist7/javassist/target/classes
+    [mkdir] Created dir: /root/git/javassist7/javassist/target/test-classes
+    [mkdir] Created dir: /root/git/javassist7/javassist/target/test-output
+    [mkdir] Created dir: /root/git/javassist7/javassist/runtest
+
+compile14:
+    [javac] /root/git/javassist7/javassist/build.xml:80: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 212 source files to /root/git/javassist7/javassist/target/classes
+    [javac] warning: [options] bootstrap class path not set in conjunction with -source 1.4
+    [javac] 1 warning
+
+jar:
+      [jar] Building jar: /root/git/javassist7/javassist/javassist.jar
+      [jar] Building jar: /root/git/javassist7/javassist/javassist-src.jar
+
+BUILD SUCCESSFUL
+Total time: 5 seconds
+root@daveti-virtual-machine:~/git/javassist7/javassist# ll
+total 1956
+drwxr-xr-x 8 root root   4096 May 11 10:40 ./
+drwxr-xr-x 3 root root   4096 May 11 10:38 ../
+-rw-r--r-- 1 root root  10678 May 11 10:39 build.xml
+drwxr-xr-x 8 root root   4096 May 11 10:39 .git/
+-rw-r--r-- 1 root root    103 May 11 10:39 .gitignore
+-rw-r--r-- 1 root root 677704 May 11 10:40 javassist.jar
+-rw-r--r-- 1 root root 684237 May 11 10:39 javassist.jar.orig
+-rw-r--r-- 1 root root 513634 May 11 10:40 javassist-src.jar
+-rw-r--r-- 1 root root  25890 May 11 10:39 License.html
+-rw-r--r-- 1 root root   9526 May 11 10:39 pom.xml
+-rw-r--r-- 1 root root  26636 May 11 10:39 Readme.html
+drwxr-xr-x 2 root root   4096 May 11 10:40 runtest/
+drwxr-xr-x 9 root root   4096 May 11 10:39 sample/
+drwxr-xr-x 4 root root   4096 May 11 10:39 src/
+drwxr-xr-x 5 root root   4096 May 11 10:40 target/
+drwxr-xr-x 2 root root   4096 May 11 10:39 tutorial/
+root@daveti-virtual-machine:~/git/javassist7/javassist# 
+
+7. Copy javassist.jar to lib and source
+cp ./javassist.jar /root/jdk7u60/build/linux-amd64/j2sdk-image/jre/lib/ext
+cp ./javassist.jar /root/java7ssl/org/davejingtian/certshim/lib
+
+8. Build the certShimAgent.jar
+root@daveti-virtual-machine:~/java7ssl/org/davejingtian/certshim/agent# /root/jdk7u60/build/linux-amd64/j2sdk-image/bin/javac Agent.java
+root@daveti-virtual-machine:~/java7ssl/org/davejingtian/certshim/agent# ll
+total 20
+drwxr-xr-x 2 root root 4096 May 11 11:12 ./
+drwxr-xr-x 4 root root 4096 May 10 19:56 ../
+-rw-r--r-- 1 root root 3244 May 11 11:12 Agent$1.class
+-rw-r--r-- 1 root root  716 May 11 11:12 Agent.class
+-rw-r--r-- 1 root root 3555 May 11 11:12 Agent.java
+root@daveti-virtual-machine:~/java7ssl/org/davejingtian/certshim/agent# cd ../../../../
+root@daveti-virtual-machine:~/java7ssl# ll
+total 28
+drwxr-xr-x 3 root root 4096 May 10 22:16 ./
+drwx------ 8 root root 4096 May 11 11:12 ../
+-rw-r--r-- 1 root root   91 May 10 19:56 manifest.txt
+drwxr-xr-x 3 root root 4096 May 10 19:56 org/
+-rw-r--r-- 1 root root 2215 May 10 22:14 README.md
+-rw-r--r-- 1 root root 2467 May 10 22:16 SSLSocketClient.class
+-rw-r--r-- 1 root root 1711 May 10 22:16 SSLSocketClient.java
+root@daveti-virtual-machine:~/java7ssl# /root/jdk7u60/build/linux-amd64/j2sdk-image/bin/jar cmf ./manifest.txt certShimAgent.jar ./org
+root@daveti-virtual-machine:~/java7ssl# ll
+total 656
+drwxr-xr-x 3 root root   4096 May 11 11:14 ./
+drwx------ 8 root root   4096 May 11 11:12 ../
+-rw-r--r-- 1 root root 639782 May 11 11:14 certShimAgent.jar
+-rw-r--r-- 1 root root     91 May 10 19:56 manifest.txt
+drwxr-xr-x 3 root root   4096 May 10 19:56 org/
+-rw-r--r-- 1 root root   2215 May 10 22:14 README.md
+-rw-r--r-- 1 root root   2467 May 10 22:16 SSLSocketClient.class
+-rw-r--r-- 1 root root   1711 May 10 22:16 SSLSocketClient.java
+root@daveti-virtual-machine:~/java7ssl# 
+
+9. Run
+root@daveti-virtual-machine:~/java7ssl# /root/jdk7u60/build/linux-amd64/j2sdk-image/bin/java -javaagent:certShimAgent.jar SSLSocketClient
+daveti: Agent starts!
+Before loading class sun/launcher/LauncherHelper
+Before loading class SSLSocketClient
+Before loading class java/security/Provider
+Before loading class com/sun/net/ssl/internal/ssl/Provider
+Before loading class sun/security/ssl/SunJSSE
+Before loading class java/lang/Void
+Before loading class sun/net/www/protocol/http/Handler
+Before loading class java/security/Provider$ServiceKey
+Before loading class java/security/Provider$EngineDescription
+Before loading class sun/misc/FloatingDecimal
+Before loading class sun/misc/FloatingDecimal$1
+Before loading class java/lang/StrictMath
+Before loading class sun/misc/FpUtils
+Before loading class sun/security/ssl/SunJSSE$1
+Before loading class java/security/Security
+Before loading class java/security/Security$1
+Before loading class java/util/Properties$LineReader
+Before loading class sun/security/jca/Providers
+Before loading class java/lang/InheritableThreadLocal
+Before loading class sun/security/jca/ProviderList
+Before loading class sun/security/jca/ProviderConfig
+Before loading class sun/security/jca/ProviderList$3
+Before loading class sun/security/jca/ProviderList$1
+Before loading class sun/security/jca/ProviderList$2
+Before loading class sun/security/jca/ProviderConfig$2
+Before loading class sun/security/provider/Sun
+Before loading class sun/security/provider/SunEntries
+Before loading class sun/security/provider/SunEntries$1
+Before loading class sun/security/provider/NativePRNG
+Before loading class java/security/SecureRandomSpi
+Before loading class sun/security/provider/NativePRNG$1
+Before loading class sun/security/provider/NativePRNG$RandomIO
+Before loading class sun/security/rsa/SunRsaSign
+Before loading class sun/security/rsa/SunRsaSignEntries
+Before loading class sun/security/ec/SunEC
+Before loading class java/lang/UnsatisfiedLinkError
+Before loading class sun/security/ec/SunEC$1
+Before loading class sun/security/ec/SunECEntries
+Before loading class com/sun/crypto/provider/SunJCE
+Before loading class java/security/SecureRandom
+Before loading class java/util/AbstractList$Itr
+Before loading class java/util/LinkedHashMap$EntryIterator
+Before loading class java/util/LinkedHashMap$LinkedHashIterator
+Before loading class java/security/Provider$Service
+Before loading class java/security/Provider$UString
+Before loading class java/util/LinkedHashSet
+Before loading class java/util/HashMap$Values
+Before loading class java/util/LinkedHashMap$ValueIterator
+Before loading class java/util/Collections$UnmodifiableSet
+Before loading class java/util/Collections$UnmodifiableCollection$1
+Before loading class java/util/HashMap$KeySet
+Before loading class java/util/LinkedHashMap$KeyIterator
+Before loading class sun/security/jca/GetInstance
+Before loading class sun/security/jca/GetInstance$Instance
+Before loading class com/sun/crypto/provider/SunJCE$1
+Before loading class sun/security/jgss/SunProvider
+Before loading class sun/security/jgss/SunProvider$1
+Before loading class com/sun/security/sasl/Provider
+Before loading class com/sun/security/sasl/Provider$1
+Before loading class org/jcp/xml/dsig/internal/dom/XMLDSigRI
+Before loading class org/jcp/xml/dsig/internal/dom/XMLDSigRI$1
+Before loading class sun/security/smartcardio/SunPCSC
+Before loading class sun/security/smartcardio/SunPCSC$1
+Before loading class javax/net/ssl/SSLSocketFactory
+Before loading class javax/net/SocketFactory
+Before loading class javax/net/ssl/SSLSocketFactory$1
+Before loading class javax/net/ssl/SSLContext
+Before loading class javax/net/ssl/SSLContextSpi
+Before loading class sun/security/ssl/SSLContextImpl$DefaultSSLContext
+Before loading class sun/security/ssl/SSLContextImpl$ConservativeSSLContext
+Before loading class sun/security/ssl/SSLContextImpl
+Before loading class sun/security/ssl/Debug
+Before loading class javax/net/ssl/SSLParameters
+daveti: debug - target1
+daveti: debug - try
+daveti: denbug - try target1
+Enhancing class javax.net.ssl.SSLParameters
+Enhancing method (Ljava/lang/String;)V
+Enhanced bytecode
+Before loading class sun/security/ssl/ProtocolVersion
+Before loading class sun/security/ssl/SSLAlgorithmConstraints
+Before loading class java/security/AlgorithmConstraints
+Before loading class sun/security/ssl/SSLAlgorithmConstraints$TLSDisabledAlgConstraints
+Before loading class sun/security/ssl/SSLAlgorithmConstraints$BasicDisabledAlgConstraints
+Before loading class sun/security/util/DisabledAlgorithmConstraints
+Before loading class java/util/Collections$SynchronizedMap
+Before loading class sun/security/util/DisabledAlgorithmConstraints$1
+Before loading class sun/security/util/DisabledAlgorithmConstraints$KeySizeConstraints
+Before loading class java/util/regex/Pattern
+Before loading class java/util/regex/Pattern$4
+Before loading class java/util/regex/Pattern$Node
+Before loading class java/util/regex/Pattern$LastNode
+Before loading class java/util/regex/Pattern$GroupHead
+Before loading class java/util/regex/Pattern$GroupTail
+Before loading class java/util/regex/Pattern$Ctype
+Before loading class java/util/regex/Pattern$BmpCharProperty
+Before loading class java/util/regex/Pattern$CharProperty
+Before loading class java/util/regex/Pattern$CharProperty$1
+Before loading class java/util/regex/Pattern$Curly
+Before loading class java/util/regex/Pattern$Slice
+Before loading class java/util/regex/Pattern$SliceNode
+Before loading class java/util/regex/Pattern$Single
+Before loading class java/util/regex/Pattern$BranchConn
+Before loading class java/util/regex/Pattern$Branch
+Before loading class java/util/regex/Pattern$Begin
+Before loading class java/util/regex/Pattern$First
+Before loading class java/util/regex/Pattern$Start
+Before loading class java/util/regex/Pattern$TreeInfo
+Before loading class sun/security/ssl/SSLAlgorithmConstraints$X509DisabledAlgConstraints
+Before loading class java/util/ArrayList$SubList
+Before loading class java/util/ArrayList$SubList$1
+Before loading class java/util/regex/Matcher
+Before loading class java/util/regex/MatchResult
+Before loading class java/util/regex/ASCII
+Before loading class sun/security/util/DisabledAlgorithmConstraints$KeySizeConstraint$Operator
+Before loading class sun/security/util/DisabledAlgorithmConstraints$KeySizeConstraint
+Before loading class sun/security/util/DisabledAlgorithmConstraints$2
+Before loading class sun/security/ssl/EphemeralKeyManager
+Before loading class sun/security/ssl/EphemeralKeyManager$EphemeralKeyPair
+Before loading class sun/security/ssl/SSLSessionContextImpl
+Before loading class javax/net/ssl/SSLSessionContext
+Before loading class sun/security/ssl/SSLSessionContextImpl$1
+Before loading class sun/security/util/Cache
+Before loading class sun/security/util/MemoryCache
+Before loading class sun/security/ssl/SSLContextImpl$DefaultSSLContext$1
+Before loading class java/security/KeyStore
+Before loading class java/security/KeyStore$1
+Before loading class java/security/KeyStoreSpi
+Before loading class sun/security/provider/JavaKeyStore$JKS
+Before loading class sun/security/provider/JavaKeyStore
+Before loading class javax/net/ssl/KeyManagerFactory
+Before loading class javax/net/ssl/KeyManagerFactory$1
+Before loading class javax/net/ssl/KeyManagerFactorySpi
+Before loading class sun/security/ssl/KeyManagerFactoryImpl$SunX509
+Before loading class sun/security/ssl/KeyManagerFactoryImpl
+Before loading class sun/security/ssl/SunX509KeyManagerImpl
+Before loading class javax/net/ssl/X509ExtendedKeyManager
+Before loading class javax/net/ssl/X509KeyManager
+Before loading class javax/net/ssl/KeyManager
+Before loading class java/util/Collections$EmptyEnumeration
+Before loading class sun/security/ssl/TrustManagerFactoryImpl
+Before loading class javax/net/ssl/TrustManagerFactorySpi
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$2
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$1
+Before loading class sun/security/provider/JavaKeyStore$TrustedCertEntry
+Before loading class java/util/Date
+Before loading class sun/util/calendar/CalendarSystem
+Before loading class sun/util/calendar/Gregorian
+Before loading class sun/util/calendar/BaseCalendar
+Before loading class sun/util/calendar/AbstractCalendar
+Before loading class java/security/cert/CertificateFactory
+Before loading class java/security/cert/CertificateFactorySpi
+Before loading class sun/security/provider/X509Factory
+Before loading class sun/security/util/Cache$EqualByteArray
+Before loading class sun/security/x509/X509CertImpl
+Before loading class sun/security/util/DerEncoder
+Before loading class java/security/cert/X509Certificate
+Before loading class java/security/cert/X509Extension
+Before loading class sun/security/util/DerValue
+Before loading class sun/security/util/DerInputStream
+Before loading class sun/security/util/DerInputBuffer
+Before loading class sun/security/util/DerOutputStream
+Before loading class sun/security/util/ByteArrayLexOrder
+Before loading class sun/security/util/ByteArrayTagOrder
+Before loading class sun/security/x509/AlgorithmId
+Before loading class sun/security/util/ObjectIdentifier
+Before loading class sun/security/x509/X509CertInfo
+Before loading class sun/security/x509/CertAttrSet
+Before loading class sun/security/x509/CertificateVersion
+Before loading class java/math/BigInteger
+Before loading class sun/security/x509/CertificateSerialNumber
+Before loading class sun/security/x509/SerialNumber
+Before loading class sun/security/x509/CertificateAlgorithmId
+Before loading class sun/security/x509/CertificateIssuerName
+Before loading class sun/security/x509/X500Name
+Before loading class sun/security/x509/GeneralNameInterface
+Before loading class sun/security/x509/X500Name$1
+Before loading class javax/security/auth/x500/X500Principal
+Before loading class sun/security/x509/RDN
+Before loading class sun/security/util/DerIndefLenConverter
+Before loading class sun/security/x509/AVA
+Before loading class sun/security/x509/CertificateValidity
+Before loading class sun/util/calendar/Gregorian$Date
+Before loading class sun/util/calendar/BaseCalendar$Date
+Before loading class sun/util/calendar/CalendarDate
+Before loading class sun/util/calendar/CalendarUtils
+Before loading class sun/security/x509/CertificateSubjectName
+Before loading class sun/security/x509/CertificateX509Key
+Before loading class sun/security/x509/X509Key
+Before loading class java/security/PublicKey
+Before loading class java/security/Key
+Before loading class sun/security/util/BitArray
+Before loading class java/security/spec/X509EncodedKeySpec
+Before loading class java/security/spec/EncodedKeySpec
+Before loading class java/security/spec/KeySpec
+Before loading class java/security/KeyFactory
+Before loading class sun/security/jca/ProviderList$ServiceList
+Before loading class sun/security/jca/ProviderList$ServiceList$1
+Before loading class sun/security/rsa/RSAKeyFactory
+Before loading class java/security/KeyFactorySpi
+Before loading class java/security/spec/RSAPublicKeySpec
+Before loading class java/security/spec/RSAPrivateKeySpec
+Before loading class java/security/spec/RSAPrivateCrtKeySpec
+Before loading class java/security/spec/PKCS8EncodedKeySpec
+Before loading class sun/security/rsa/RSAPublicKeyImpl
+Before loading class java/security/interfaces/RSAPublicKey
+Before loading class java/security/interfaces/RSAKey
+Before loading class sun/security/rsa/RSAPrivateCrtKeyImpl
+Before loading class java/security/interfaces/RSAPrivateCrtKey
+Before loading class java/security/interfaces/RSAPrivateKey
+Before loading class java/security/PrivateKey
+Before loading class sun/security/pkcs/PKCS8Key
+Before loading class sun/security/x509/CertificateExtensions
+Before loading class java/util/TreeMap
+Before loading class java/util/NavigableMap
+Before loading class java/util/SortedMap
+Before loading class sun/security/x509/Extension
+Before loading class java/security/cert/Extension
+Before loading class sun/security/x509/OIDMap
+Before loading class sun/security/x509/PKIXExtensions
+Before loading class sun/security/x509/OIDMap$OIDInfo
+Before loading class sun/security/x509/BasicConstraintsExtension
+Before loading class java/util/TreeMap$Entry
+Before loading class sun/security/x509/IssuerAlternativeNameExtension
+Before loading class sun/security/x509/GeneralNames
+Before loading class sun/security/x509/GeneralName
+Before loading class sun/security/x509/DNSName
+Before loading class sun/nio/cs/US_ASCII$Decoder
+Before loading class sun/security/x509/OtherName
+Before loading class sun/security/x509/SubjectKeyIdentifierExtension
+Before loading class sun/security/x509/KeyIdentifier
+Before loading class sun/security/x509/AuthorityKeyIdentifierExtension
+Before loading class sun/security/x509/KeyUsageExtension
+Before loading class sun/security/x509/SubjectAlternativeNameExtension
+Before loading class sun/security/x509/CRLDistributionPointsExtension
+Before loading class sun/security/x509/DistributionPoint
+Before loading class sun/security/x509/URIName
+Before loading class java/net/URI
+Before loading class java/net/URI$Parser
+Before loading class sun/security/x509/AuthorityInfoAccessExtension
+Before loading class sun/security/x509/AccessDescription
+Before loading class sun/security/x509/CertificatePoliciesExtension
+Before loading class sun/security/x509/PolicyInformation
+Before loading class sun/security/x509/CertificatePolicyId
+Before loading class java/security/cert/PolicyQualifierInfo
+Before loading class sun/security/x509/X509AttributeName
+Before loading class sun/security/util/MemoryCache$SoftCacheEntry
+Before loading class sun/security/util/MemoryCache$CacheEntry
+Before loading class sun/security/x509/PolicyMappingsExtension
+Before loading class sun/security/x509/CertificatePolicyMap
+Before loading class sun/security/x509/NetscapeCertTypeExtension
+Before loading class sun/security/x509/NetscapeCertTypeExtension$MapEntry
+Before loading class sun/security/x509/RFC822Name
+Before loading class sun/reflect/MethodAccessorGenerator
+Before loading class sun/reflect/AccessorGenerator
+Before loading class sun/reflect/ClassFileConstants
+Before loading class sun/reflect/ByteVectorFactory
+Before loading class sun/reflect/ByteVectorImpl
+Before loading class sun/reflect/ByteVector
+Before loading class sun/reflect/ClassFileAssembler
+Before loading class sun/reflect/UTF8
+Before loading class sun/reflect/Label
+Before loading class sun/reflect/Label$PatchInfo
+Before loading class sun/reflect/MethodAccessorGenerator$1
+Before loading class sun/reflect/ClassDefiner
+Before loading class sun/reflect/ClassDefiner$1
+Before loading class sun/reflect/GeneratedConstructorAccessor1
+Before loading class sun/reflect/BootstrapConstructorAccessorImpl
+Before loading class sun/reflect/GeneratedConstructorAccessor2
+Before loading class sun/reflect/GeneratedConstructorAccessor3
+Before loading class sun/reflect/GeneratedConstructorAccessor4
+Before loading class java/security/AlgorithmParameters
+Before loading class java/security/AlgorithmParametersSpi
+Before loading class java/security/NoSuchAlgorithmException
+Before loading class java/security/GeneralSecurityException
+Before loading class java/security/NoSuchProviderException
+Before loading class sun/security/ec/ECKeyFactory
+Before loading class sun/security/ec/ECKeyFactory$1
+Before loading class sun/security/ec/ECKeyFactory$2
+Before loading class sun/security/ec/ECParameters
+Before loading class sun/security/ec/NamedCurve
+Before loading class java/security/spec/ECParameterSpec
+Before loading class java/security/spec/AlgorithmParameterSpec
+Before loading class java/security/spec/ECFieldFp
+Before loading class java/security/spec/ECField
+Before loading class java/security/spec/EllipticCurve
+Before loading class java/security/spec/ECPoint
+Before loading class java/security/spec/ECFieldF2m
+Before loading class sun/security/ec/ECPublicKeyImpl
+Before loading class java/security/interfaces/ECPublicKey
+Before loading class java/security/interfaces/ECKey
+Before loading class sun/security/x509/PrivateKeyUsageExtension
+Before loading class java/security/cert/CertificateException
+Before loading class sun/reflect/GeneratedConstructorAccessor5
+Before loading class sun/misc/Cleaner
+Before loading class sun/security/x509/ExtendedKeyUsageExtension
+Before loading class sun/reflect/GeneratedConstructorAccessor6
+Before loading class sun/reflect/GeneratedConstructorAccessor7
+Before loading class sun/security/x509/NameConstraintsExtension
+Before loading class sun/security/x509/GeneralSubtrees
+Before loading class sun/security/x509/GeneralSubtree
+Before loading class sun/security/x509/UnparseableExtension
+Before loading class sun/reflect/UnsafeFieldAccessorFactory
+Before loading class sun/reflect/UnsafeQualifiedStaticObjectFieldAccessorImpl
+Before loading class sun/reflect/UnsafeQualifiedStaticFieldAccessorImpl
+Before loading class sun/reflect/GeneratedConstructorAccessor8
+Before loading class javax/net/ssl/TrustManagerFactory
+Before loading class javax/net/ssl/TrustManagerFactory$1
+Before loading class sun/security/ssl/TrustManagerFactoryImpl$PKIXFactory
+Before loading class sun/security/ssl/X509TrustManagerImpl
+daveti: debug - target
+daveti: debug - try
+daveti: debug - try target
+Enhancing class sun.security.ssl.X509TrustManagerImpl
+Enhancing method (Ljava/lang/String;Ljava/security/cert/X509Certificate;Ljava/lang/String;)V
+Enhanced bytecode
+Before loading class javax/net/ssl/X509TrustManager
+Before loading class javax/net/ssl/TrustManager
+Before loading class javax/net/ssl/X509ExtendedTrustManager
+Before loading class sun/security/validator/KeyStores
+Before loading class java/lang/CharacterData00
+Before loading class sun/security/ssl/JsseJce
+Before loading class sun/security/ssl/JsseJce$1
+Before loading class sun/security/krb5/PrincipalName
+Before loading class sun/security/provider/SecureRandom
+Before loading class java/security/MessageDigest
+Before loading class java/security/MessageDigestSpi
+Before loading class sun/security/provider/SHA
+Before loading class sun/security/provider/DigestBase
+Before loading class java/security/MessageDigest$Delegate
+Before loading class sun/security/provider/ByteArrayAccess
+Before loading class sun/security/ssl/SSLSocketFactoryImpl
+Before loading class sun/security/ssl/SSLSocketImpl
+Before loading class sun/security/ssl/BaseSSLSocketImpl
+Before loading class javax/net/ssl/SSLSocket
+Before loading class java/net/Socket
+Before loading class java/net/SocksSocketImpl
+Before loading class java/net/SocksConsts
+Before loading class java/net/PlainSocketImpl
+Before loading class java/net/AbstractPlainSocketImpl
+Before loading class java/net/SocketImpl
+Before loading class java/net/SocketOptions
+Before loading class sun/security/action/LoadLibraryAction
+Before loading class sun/security/ssl/SSLSessionImpl
+Before loading class javax/net/ssl/ExtendedSSLSession
+Before loading class javax/net/ssl/SSLSession
+Before loading class sun/security/ssl/CipherSuite
+Before loading class sun/security/ssl/CipherSuite$BulkCipher
+Before loading class sun/security/ssl/CipherSuite$MacAlg
+Before loading class sun/security/ssl/CipherSuite$KeyExchange
+Before loading class sun/security/ssl/CipherSuite$PRF
+Before loading class sun/security/ssl/SessionId
+Before loading class sun/security/ssl/SignatureAndHashAlgorithm
+Before loading class java/security/CryptoPrimitive
+Before loading class java/util/EnumSet
+Before loading class java/lang/Class$4
+Before loading class java/util/RegularEnumSet
+Before loading class java/util/Collections$SynchronizedSortedMap
+Before loading class sun/security/ssl/SignatureAndHashAlgorithm$HashAlgorithm
+Before loading class sun/security/ssl/SignatureAndHashAlgorithm$SignatureAlgorithm
+Before loading class sun/security/ssl/CipherBox
+Before loading class sun/security/ssl/MAC
+Before loading class sun/security/ssl/ProtocolList
+Before loading class java/util/TreeSet
+Before loading class java/util/NavigableSet
+Before loading class java/util/SortedSet
+Before loading class java/security/Signature
+Before loading class java/security/SignatureSpi
+Before loading class sun/security/jca/ServiceId
+Before loading class sun/security/ec/ECDSASignature$SHA1
+Before loading class sun/security/ec/ECDSASignature
+Before loading class java/security/SignatureException
+Before loading class java/security/ProviderException
+Before loading class java/security/Signature$Delegate
+Before loading class sun/security/ec/ECDSASignature$Raw
+Before loading class javax/crypto/KeyAgreement
+Before loading class javax/crypto/JceSecurity
+Before loading class java/util/IdentityHashMap
+Before loading class javax/crypto/JceSecurity$1
+Before loading class javax/crypto/CryptoPermissions
+Before loading class java/util/zip/ZipFile$1
+Before loading class java/util/jar/JarFile$1
+Before loading class javax/crypto/CryptoPolicyParser
+Before loading class java/io/StreamTokenizer
+Before loading class javax/crypto/CryptoPolicyParser$GrantEntry
+Before loading class javax/crypto/CryptoPolicyParser$CryptoPermissionEntry
+Before loading class java/util/Vector$1
+Before loading class javax/crypto/CryptoAllPermission
+Before loading class javax/crypto/CryptoPermission
+Before loading class javax/crypto/CryptoAllPermissionCollection
+Before loading class javax/crypto/JarVerifier
+Before loading class javax/crypto/spec/RC2ParameterSpec
+Before loading class javax/crypto/spec/RC5ParameterSpec
+Before loading class javax/crypto/CryptoPermissionCollection
+Before loading class javax/crypto/JceSecurity$2
+Before loading class java/security/KeyPairGenerator
+Before loading class java/security/KeyPairGeneratorSpi
+Before loading class sun/security/ec/ECKeyPairGenerator
+Before loading class java/security/InvalidParameterException
+Before loading class java/security/InvalidAlgorithmParameterException
+Before loading class java/security/KeyPairGenerator$Delegate
+Before loading class javax/crypto/spec/SecretKeySpec
+Before loading class javax/crypto/SecretKey
+Before loading class javax/crypto/spec/IvParameterSpec
+Before loading class javax/crypto/Cipher
+Before loading class javax/crypto/Cipher$Transform
+Before loading class com/sun/crypto/provider/AESCipher
+Before loading class javax/crypto/CipherSpi
+Before loading class java/security/InvalidKeyException
+Before loading class java/security/KeyException
+Before loading class com/sun/crypto/provider/SymmetricCipher
+Before loading class com/sun/crypto/provider/AESCrypt
+Before loading class com/sun/crypto/provider/AESConstants
+Before loading class com/sun/crypto/provider/CipherCore
+Before loading class java/security/spec/InvalidParameterSpecException
+Before loading class javax/crypto/IllegalBlockSizeException
+Before loading class com/sun/crypto/provider/FeedbackCipher
+Before loading class com/sun/crypto/provider/CipherBlockChaining
+Before loading class com/sun/crypto/provider/CipherTextStealing
+Before loading class com/sun/crypto/provider/CounterMode
+Before loading class com/sun/crypto/provider/CipherFeedback
+Before loading class com/sun/crypto/provider/OutputFeedback
+Before loading class com/sun/crypto/provider/PCBC
+Before loading class javax/crypto/NoSuchPaddingException
+Before loading class com/sun/crypto/provider/Padding
+Before loading class javax/crypto/ShortBufferException
+Before loading class javax/crypto/BadPaddingException
+Before loading class com/sun/crypto/provider/ElectronicCodeBook
+Before loading class com/sun/crypto/provider/PKCS5Padding
+Before loading class javax/crypto/JceSecurityManager
+Before loading class java/lang/SecurityManager
+Before loading class javax/crypto/JceSecurityManager$1
+Before loading class sun/security/util/SecurityConstants
+Before loading class java/net/NetPermission
+Before loading class java/security/SecurityPermission
+Before loading class java/net/SocketPermission
+Before loading class java/net/SocketPermission$1
+Before loading class sun/net/PortConfig
+Before loading class sun/net/PortConfig$1
+Before loading class java/security/AllPermissionCollection
+Before loading class sun/security/ssl/SSLAlgorithmConstraints$1
+Before loading class sun/security/ssl/CipherSuiteList
+Before loading class sun/security/ssl/AppInputStream
+Before loading class sun/security/ssl/InputRecord
+Before loading class sun/security/ssl/Record
+Before loading class sun/security/ssl/AppOutputStream
+Before loading class sun/security/ssl/OutputRecord
+Before loading class java/net/InetSocketAddress
+Before loading class java/net/SocketAddress
+Before loading class java/net/InetAddress
+Before loading class java/net/InetSocketAddress$InetSocketAddressHolder
+Before loading class java/net/InetAddress$InetAddressHolder
+Before loading class java/net/InetAddress$Cache
+Before loading class java/net/InetAddress$Cache$Type
+Before loading class java/net/InetAddressImplFactory
+Before loading class java/net/Inet6AddressImpl
+Before loading class java/net/InetAddressImpl
+Before loading class java/net/InetAddress$1
+Before loading class sun/net/spi/nameservice/NameService
+Before loading class java/net/Inet4AddressImpl
+Before loading class java/net/Inet4Address
+Before loading class sun/net/InetAddressCachePolicy
+Before loading class sun/net/InetAddressCachePolicy$1
+Before loading class sun/security/action/GetIntegerAction
+Before loading class sun/net/InetAddressCachePolicy$2
+Before loading class java/util/LinkedList
+Before loading class java/util/AbstractSequentialList
+Before loading class java/util/LinkedList$ListItr
+Before loading class java/net/InetAddress$CacheEntry
+Before loading class java/net/Inet6Address
+Before loading class java/net/Inet6Address$Inet6AddressHolder
+Before loading class java/net/SocketException
+Before loading class java/net/SocksSocketImpl$3
+Before loading class java/net/ProxySelector
+Before loading class sun/net/spi/DefaultProxySelector
+Before loading class sun/net/spi/DefaultProxySelector$1
+Before loading class sun/net/NetProperties
+Before loading class sun/net/NetProperties$1
+Before loading class sun/net/spi/DefaultProxySelector$2
+Before loading class java/net/Proxy
+Before loading class java/net/Proxy$Type
+Before loading class sun/net/NetHooks
+Before loading class sun/net/sdp/SdpProvider
+Before loading class sun/net/NetHooks$Provider
+Before loading class java/net/Socket$2
+Before loading class java/net/SocketInputStream
+Before loading class java/net/Socket$3
+Before loading class java/net/SocketOutputStream
+Before loading class sun/security/ssl/ClientHandshaker
+Before loading class sun/security/ssl/Handshaker
+Before loading class java/util/TreeMap$KeySet
+Before loading class java/util/TreeMap$KeyIterator
+Before loading class java/util/TreeMap$PrivateEntryIterator
+daveti-target1
+null
+daveti - setEndpointIdentificationAlgorithm: algorithm [HTTPS]
+daveti-target1
+null
+daveti - setEndpointIdentificationAlgorithm: algorithm [HTTPS]
+daveti - getEndpointIdentificationAlgorithm: identificationAlgorithm [HTTPS]
+getCipherSuites(): [Ljava.lang.String;@7abdb4f
+getNeedClientAuth(): false
+getProtocols(): [Ljava.lang.String;@23cb2378
+getWantClientAuth(): false
+getEndpointIdentificationAlgorithm() [1.7]: HTTPS
+Before loading class java/io/PrintWriter
+Before loading class java/util/TreeMap$Values
+Before loading class java/util/TreeMap$ValueIterator
+Before loading class java/util/regex/Pattern$SliceI
+Before loading class sun/security/ssl/HandshakeHash
+Before loading class sun/security/ssl/HandshakeInStream
+Before loading class sun/security/ssl/HandshakeOutStream
+Before loading class sun/security/ssl/HandshakeMessage$ClientHello
+Before loading class sun/security/ssl/HandshakeMessage
+Before loading class sun/security/ssl/HelloExtensions
+Before loading class sun/security/ssl/CipherSuiteList$1
+Before loading class sun/security/ssl/SupportedEllipticCurvesExtension
+Before loading class sun/security/ssl/HelloExtension
+Before loading class sun/security/ssl/ExtensionType
+Before loading class sun/security/ssl/SupportedEllipticPointFormatsExtension
+Before loading class sun/security/ssl/RandomCookie
+Before loading class sun/net/util/IPAddressUtil
+Before loading class sun/security/ssl/ServerNameExtension
+Before loading class sun/security/ssl/ServerNameExtension$ServerName
+Before loading class sun/security/ssl/HandshakeMessage$ServerHello
+Before loading class sun/security/ssl/RenegotiationInfoExtension
+Before loading class sun/security/ssl/CloneableDigest
+Before loading class sun/security/provider/MD5
+Before loading class sun/security/ssl/HandshakeMessage$CertificateMsg
+Before loading class sun/security/validator/Validator
+Before loading class sun/security/validator/PKIXValidator
+Before loading class sun/security/validator/EndEntityChecker
+Before loading class java/security/cert/TrustAnchor
+Before loading class java/security/cert/PKIXBuilderParameters
+Before loading class java/security/cert/PKIXParameters
+Before loading class java/security/cert/CertPathParameters
+Before loading class sun/security/x509/AVAKeyword
+Before loading class sun/security/pkcs/PKCS9Attribute
+Before loading class sun/security/pkcs/SignerInfo
+Before loading class java/text/Normalizer$Form
+Before loading class java/text/Normalizer
+Before loading class sun/text/normalizer/NormalizerBase
+Before loading class sun/text/normalizer/NormalizerBase$Mode
+Before loading class sun/text/normalizer/NormalizerBase$NFDMode
+Before loading class sun/text/normalizer/NormalizerBase$NFKDMode
+Before loading class sun/text/normalizer/NormalizerBase$NFCMode
+Before loading class sun/text/normalizer/NormalizerBase$NFKCMode
+Before loading class sun/text/normalizer/NormalizerBase$QuickCheckResult
+Before loading class sun/text/normalizer/NormalizerBase$1
+Before loading class sun/reflect/GeneratedConstructorAccessor9
+Before loading class sun/text/normalizer/NormalizerImpl
+Before loading class sun/text/normalizer/ICUData
+Before loading class sun/text/normalizer/NormalizerDataReader
+Before loading class sun/text/normalizer/ICUBinary$Authenticate
+Before loading class sun/text/normalizer/ICUBinary
+Before loading class sun/text/normalizer/NormalizerImpl$FCDTrieImpl
+Before loading class sun/text/normalizer/Trie$DataManipulate
+Before loading class sun/text/normalizer/NormalizerImpl$NormTrieImpl
+Before loading class sun/text/normalizer/NormalizerImpl$AuxTrieImpl
+Before loading class sun/text/normalizer/IntTrie
+Before loading class sun/text/normalizer/Trie
+Before loading class sun/text/normalizer/CharTrie
+Before loading class sun/text/normalizer/CharTrie$FriendAgent
+Before loading class sun/text/normalizer/UnicodeSet
+Before loading class sun/text/normalizer/UnicodeMatcher
+Before loading class sun/text/normalizer/NormalizerImpl$DecomposeArgs
+daveti-target1
+null
+daveti - setEndpointIdentificationAlgorithm: algorithm [HTTPS]
+daveti - getEndpointIdentificationAlgorithm: identificationAlgorithm [HTTPS]
+daveti - checkTrusted(socket): identityAlg [HTTPS]
+daveti-target
+twitter.com
+HTTPS
+daveti - checkIdentity: algrithm [HTTPS]
+Before loading class sun/security/util/HostnameChecker
+daveti-target1
+null
+daveti - setEndpointIdentificationAlgorithm: algorithm [HTTPS]
+Before loading class sun/security/provider/certpath/AlgorithmChecker
+Before loading class java/security/cert/PKIXCertPathChecker
+Before loading class java/security/cert/CertPathValidator
+Before loading class java/security/cert/CertPathValidatorSpi
+Before loading class sun/security/provider/certpath/PKIXCertPathValidator
+Before loading class sun/security/provider/certpath/X509CertPath
+Before loading class java/security/cert/CertPath
+Before loading class sun/security/provider/certpath/AdaptableX509CertSelector
+Before loading class java/security/cert/X509CertSelector
+Before loading class java/security/cert/CertSelector
+Before loading class java/security/cert/CertPathHelperImpl
+Before loading class sun/security/provider/certpath/CertPathHelper
+Before loading class java/security/cert/CertificateParsingException
+Before loading class sun/security/provider/certpath/PolicyNodeImpl
+Before loading class java/security/cert/PolicyNode
+Before loading class java/util/Collections$SingletonSet
+Before loading class java/util/Collections$1
+Before loading class sun/security/provider/certpath/BasicChecker
+Before loading class sun/security/provider/certpath/KeyChecker
+Before loading class sun/security/provider/certpath/ConstraintsChecker
+Before loading class sun/security/provider/certpath/PolicyChecker
+Before loading class sun/security/provider/certpath/UntrustedChecker
+Before loading class sun/security/provider/certpath/PKIXMasterCertPathValidator
+Before loading class sun/security/util/UntrustedCertificates
+Before loading class java/io/PushbackInputStream
+Before loading class sun/misc/CEStreamExhausted
+Before loading class sun/reflect/GeneratedConstructorAccessor10
+Before loading class sun/reflect/GeneratedConstructorAccessor11
+Before loading class sun/reflect/GeneratedConstructorAccessor12
+Before loading class sun/security/provider/certpath/OCSPChecker
+Before loading class sun/security/util/KeyUtil
+Before loading class sun/security/util/Length
+Before loading class java/security/interfaces/DSAPublicKey
+Before loading class java/security/interfaces/DSAKey
+Before loading class sun/reflect/UnsafeObjectFieldAccessorImpl
+Before loading class sun/security/rsa/RSASignature$SHA1withRSA
+Before loading class sun/security/rsa/RSASignature
+Before loading class sun/security/rsa/RSAPrivateKeyImpl
+Before loading class sun/security/rsa/RSACore
+Before loading class sun/security/rsa/RSAPadding
+Before loading class java/math/MutableBigInteger
+Before loading class sun/security/rsa/RSASignature$SHA256withRSA
+Before loading class sun/security/provider/SHA2
+Before loading class java/security/cert/PKIXCertPathValidatorResult
+Before loading class java/security/cert/CertPathValidatorResult
+Before loading class java/util/Vector$Itr
+Before loading class sun/security/validator/SimpleValidator
+Before loading class sun/security/ssl/ClientHandshaker$2
+Before loading class sun/security/ssl/HandshakeMessage$ECDH_ServerKeyExchange
+Before loading class sun/security/ssl/HandshakeMessage$ServerKeyExchange
+Before loading class java/security/spec/ECPublicKeySpec
+Before loading class sun/security/ssl/RSASignature
+Before loading class java/util/regex/Pattern$BnM
+Before loading class com/sun/crypto/provider/RSACipher
+Before loading class java/lang/AssertionError
+Before loading class javax/crypto/spec/PSource
+Before loading class javax/crypto/spec/PSource$PSpecified
+Before loading class java/security/Signature$CipherAdapter
+Before loading class javax/crypto/NullCipher
+Before loading class sun/security/ssl/ECDHCrypt
+Before loading class sun/security/ec/ECPrivateKeyImpl
+Before loading class java/security/interfaces/ECPrivateKey
+Before loading class java/security/KeyPair
+Before loading class sun/security/ssl/HandshakeMessage$ServerHelloDone
+Before loading class sun/security/ssl/ECDHClientKeyExchange
+Before loading class sun/security/ec/ECDHKeyAgreement
+Before loading class javax/crypto/KeyAgreementSpi
+Before loading class java/lang/IllegalStateException
+Before loading class sun/security/internal/spec/TlsMasterSecretParameterSpec
+Before loading class javax/crypto/KeyGenerator
+Before loading class com/sun/crypto/provider/TlsMasterSecretGenerator
+Before loading class javax/crypto/KeyGeneratorSpi
+Before loading class java/security/DigestException
+Before loading class com/sun/crypto/provider/TlsPrfGenerator
+Before loading class java/io/UnsupportedEncodingException
+Before loading class com/sun/crypto/provider/TlsMasterSecretGenerator$TlsMasterSecretKey
+Before loading class sun/security/internal/interfaces/TlsMasterSecret
+Before loading class sun/security/internal/spec/TlsKeyMaterialParameterSpec
+Before loading class com/sun/crypto/provider/TlsKeyMaterialGenerator
+Before loading class sun/security/internal/spec/TlsKeyMaterialSpec
+Before loading class sun/security/ssl/HandshakeMessage$Finished
+Before loading class sun/security/internal/spec/TlsPrfParameterSpec
+Before loading class com/sun/crypto/provider/TlsPrfGenerator$V10
+Before loading class java/util/Collections$SingletonList
+Before loading class com/sun/crypto/provider/ARCFOURCipher
+Before loading class javax/crypto/Mac
+Before loading class com/sun/crypto/provider/HmacSHA1
+Before loading class javax/crypto/MacSpi
+Before loading class com/sun/crypto/provider/HmacCore
+HTTP/1.1 200 OK
+cache-control: no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+content-length: 45699
+content-type: text/html;charset=utf-8
+date: Sun, 11 May 2014 19:02:08 GMT
+expires: Tue, 31 Mar 1981 05:00:00 GMT
+last-modified: Sun, 11 May 2014 19:02:08 GMT
+ms: S
+pragma: no-cache
+server: tfe
+set-cookie: _twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoHaWQiJWEzODY4NjU4ODk5ZmRiZWVmZDEyOWRm%250ANTc4MGQwZjBmOg9jcmVhdGVkX2F0bCsI1uWp7EUBOgxjc3JmX2lkIiUwZjU3%250AOTdhZDk1OGU3ZjJhNDA5N2E3OGI0Njc0MzE3MA%253D%253D--496de541bce179304fe53777893bf60fab5b6fd3; Path=/; Domain=.twitter.com; Secure; HTTPOnly
+set-cookie: guest_id=v1%3A139983492859418331; Domain=.twitter.com; Path=/; Expires=Tue, 10-May-2016 19:02:08 UTC
+status: 200 OK
+strict-transport-security: max-age=631138519
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-tfe-logging-request-category: WEB
+x-transaction: 543b78a44dfc55b4
+x-ua-compatible: IE=edge,chrome=1
+x-xss-protection: 1; mode=block
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="lt-ie10 ie8" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if IE 9]><html class="lt-ie10 ie9" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en" data-scribe-reduced-action-queue="true"><!--<![endif]-->
+  <head>
+    
+
+10. Compare with the run without agent...
+root@daveti-virtual-machine:~/java7ssl# /root/jdk7u60/build/linux-amd64/j2sdk-image/bin/java SSLSocketClient
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+daveti - getEndpointIdentificationAlgorithm: identificationAlgorithm [null]
+getCipherSuites(): [Ljava.lang.String;@2b977d1b
+getNeedClientAuth(): false
+getProtocols(): [Ljava.lang.String;@66968df8
+getWantClientAuth(): false
+getEndpointIdentificationAlgorithm() [1.7]: null
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+daveti - getEndpointIdentificationAlgorithm: identificationAlgorithm [null]
+daveti - checkTrusted(socket): identityAlg [null]
+daveti - setEndpointIdentificationAlgorithm: algorithm [null]
+HTTP/1.1 200 OK
+cache-control: no-cache, no-store, must-revalidate, pre-check=0, post-check=0
+content-length: 45699
+content-type: text/html;charset=utf-8
+date: Sun, 11 May 2014 19:04:14 GMT
+expires: Tue, 31 Mar 1981 05:00:00 GMT
+last-modified: Sun, 11 May 2014 19:04:14 GMT
+ms: S
+pragma: no-cache
+server: tfe
+set-cookie: _twitter_sess=BAh7CToMY3NyZl9pZCIlMWZlMzdhNjJhZjUwZmJiMzNjYmY5OGNlMjUxZGYx%250AODUiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh%250Ac2h7AAY6CkB1c2VkewA6D2NyZWF0ZWRfYXRsKwiO0avsRQE6B2lkIiVkMDA0%250AZmU2YjNmOTlkOGFiNjBkMmFmZWQyMWUzYzQ3MA%253D%253D--e32dd9d746277eb412ebc19a806ed3961e2074ba; Path=/; Domain=.twitter.com; Secure; HTTPOnly
+set-cookie: guest_id=v1%3A139983505447511373; Domain=.twitter.com; Path=/; Expires=Tue, 10-May-2016 19:04:14 UTC
+status: 200 OK
+strict-transport-security: max-age=631138519
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-tfe-logging-request-category: WEB
+x-transaction: ad638f57374cc1eb
+x-ua-compatible: IE=edge,chrome=1
+x-xss-protection: 1; mode=block
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="lt-ie10 ie8" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if IE 9]><html class="lt-ie10 ie9" lang="en data-scribe-reduced-action-queue="true""><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en" data-scribe-reduced-action-queue="true"><!--<![endif]-->
+  <head>
+
+
